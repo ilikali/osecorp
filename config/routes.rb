@@ -1,3 +1,4 @@
 Rails.application.routes.draw do
-  root to: "home#index"
+  root to: "osecorp#home"
+  get "about", to: "osecorp#about"
 end

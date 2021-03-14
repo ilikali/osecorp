@@ -16,23 +16,20 @@
     <link rel="icon" type="image/png" href="<%= asset_path('fav/favicon-96x96.png') %>" sizes="96x96"/>
     <link rel="icon" type="image/png" href="<%= asset_path('fav/favicon-32x32.png') %>" sizes="32x32"/>
     <link rel="icon" type="image/png" href="<%= asset_path('fav/favicon-16x16.png') %>" sizes="16x16"/>
-
-
-    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
-    <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
-
-
-
     <meta property="og:title" content="Osecorp">
     <meta property="og:description" content="">
     <meta property="og:image" content="<%= asset_url('og_image.jpg') %>">
     <meta property="og:url" content="https://gccworkshop.com/">
-
+    
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
 
   <body class="controller_<%=controller_name %> controller_<%=action_name %>">
+    <div class="canvas_holder"><canvas class="webgl"></canvas></div>
     <div id="app" class="total_wrap">
       <%= render 'shared/header' %>
+
       <div class="content_area">
           <%= yield %>
       </div>

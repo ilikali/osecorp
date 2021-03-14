@@ -1,3 +1,158 @@
+* {
+margin: 0;
+padding: 0;
+border: 0;
+outline: 0;
+font-size: 100%;
+vertical-align: baseline;
+background: transparent;
+}
+
+
 body {
+font: 14px/1.4 'l', Arial, sans-serif;
+z-index:0;
+overflow-x: hidden;
 background:black;
+color:black;
+}
+
+body.overflow {
+overflow: hidden;
+}
+
+.screen-reader-text { position: absolute; left: -9999px; top: -9999px; }
+
+img {
+border: 0;
+}
+
+h1, h2, h3, h4 {
+font-weight:normal;
+}
+
+h1 {
+font-size:2.4em;
+}
+
+h2 {
+font-size:1.4em;
+}
+
+h3 {
+font-size:1.2em;
+}
+
+a {
+color:#3598F7;
+text-decoration:none;
+}
+
+a:hover {
+text-decoration:none;
+}
+
+.sim_link:hover {
+text-decoration:underline;
+}
+
+ul {
+list-style:none;
+}
+
+input[type='text'], select, button{
+outline:none;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+-webkit-appearance:none;
+-moz-appearance:none;
+appearance:none;
+}
+
+input:focus {
+outline:none;
+}
+
+button {
+cursor: pointer;
+}
+
+b {
+font-weight:normal;
+}
+
+table {
+border-collapse: collapse;
+}
+
+.clear:after {
+visibility: hidden;
+display: block;
+font-size: 0;
+content: " ";
+clear: both;
+height: 0;
+}
+
+* html .clear             { zoom: 1; } /* IE6 */
+*:first-child+html .clear { zoom: 1; } /* IE7 */
+
+@font-face {
+    font-family: 'b';
+    src: url('font/Goldman-Bold.woff2') format('woff2'),
+        url('font/Goldman-Bold.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'l';
+    src: url('font/NeuePlak-Light.woff2') format('woff2'),
+        url('font/NeuePlak-Light.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+.canvas_holder {
+width: 100vw;
+height: 100vh;
+position: fixed;
+z-index: -1;
+top:0x;
+left:0px;
+}
+
+
+.logo {
+display: flex;
+align-items: center;
+}
+
+.logo_self {
+width: 50px;
+height: 50px;
+margin: 0 10px 0 0;
+}
+
+.logo_self video{
+width: 100%;
+mix-blend-mode: screen;
+}
+
+.type {
+width: 145px;
+height: 50px;
+background: url(img/type.svg) no-repeat left center;
+background-size: contain;
+}
+
+
+
+
+@media screen and (max-width: 1000px) {
+
+
 }
