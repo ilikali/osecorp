@@ -1,5 +1,11 @@
 {
-  "name": "osecorp",
-  "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "@rails/webpacker": "5.2.1",
+    "dat.gui": "^0.7.7",
+    "three": "^0.126.1",
+    "turbolinks": "^5.2.0"
+  },
+  "devDependencies": {
+    "webpack-dev-server": "^3.11.2"
+  }
 }

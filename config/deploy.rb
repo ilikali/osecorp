@@ -1,6 +1,6 @@
 # config valid for current version and patch releases of Capistrano
 lock "~> 3.16.0"
-
+after 'deploy:updated', 'webpacker:precompile'
 set :application, "osecorp"
 set :repo_url, "git@github.com:ilikali/osecorp.git"
 
