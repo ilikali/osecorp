@@ -4,42 +4,6 @@
         <%= link_to "", root_path, class: "logo" %>
       </div>
       <div class="head_right">
-        <div class="hr_item">
-          <button class="sl_bttn"><span class="lang_span lang_<%= t('locale_name').downcase %>"><%= t('locale_name') %></span><b class="arr"></b></button>
-          <div class="sl_dd">
-            <ul class="sl_ul">
-              <%= content_tag :li do %>
-                <%= link_to 'English', request.params.merge( locale: :en ) %>
-              <% end unless current_page?(locale: :en) %>
-              <%= content_tag :li do %>
-                <%= link_to 'Türkçe', request.params.merge( locale: :tr ) %>
-              <% end unless current_page?(locale: :tr) %>
-              <%= content_tag :li do %>
-                <%= link_to 'На русском', request.params.merge( locale: :ru ) %>
-              <% end unless current_page?(locale: :ru) %>
-            </ul>
-          </div>
-        </div>
-        <% if user_signed_in? %>
-          <div class="hr_item">
-            <button class="sl_bttn user_circle"><span class="user_in"><%= current_user.name[0] %> <%= current_user.surname[0] %></span></button>
-            <div class="sl_dd user_menu">
-              <ul class="sl_ul">
-                <li><%= link_to t('user_menu.your_meetings'), meetings_path %></li>
-                <!--<li><%= link_to t('user_menu.profile'), edit_user_registration_path %></li>-->
-                <li><%= link_to(t('user_menu.logout'), destroy_user_session_path, method: :delete) %></li>
-              </ul>
-            </div>
-          </div>
-        <% else %>
-          <div class="hr_item">
-            <%= link_to(t('login'), new_user_session_path, class: "tr_bttn") %>
-          </div>
-          <div class="hr_item">
-          <%= link_to(t('sign_up'), new_user_registration_path, class: "blue_bttn") %>
-          </div>
-        <% end %>
-
       </div>
     </div>
 </header>
