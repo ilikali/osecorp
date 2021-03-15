@@ -1,13 +1,14 @@
 <header>
     <div class="head_left">
-      <%= link_to root_path, class: "logo" do %>
-        <div class="logo_self">
-          <video poster="" muted="" loop="" class="video" autoplay="" playsinline="">
-							<source src="<%= asset_url('logo.mp4') %>" type="video/mp4">
-					</video>
+        <div class="logo">
+          <%= link_to "", root_path, class: "logo_link" %>
+          <div class="logo_self">
+            <video poster="" muted="" loop="" class="video" autoplay="" playsinline="">
+  							<source src="<%= asset_url('logo.mp4') %>" type="video/mp4">
+  					</video>
+          </div>
+          <div class="type"></div>
         </div>
-        <div class="type"></div>
-      <% end %>
     </div>
     <div class="head_right">
       <nav>

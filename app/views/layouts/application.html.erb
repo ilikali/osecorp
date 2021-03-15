@@ -20,16 +20,15 @@
     <meta property="og:description" content="">
     <meta property="og:image" content="<%= asset_url('og_image.jpg') %>">
     <meta property="og:url" content="https://gccworkshop.com/">
-    
+
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
     <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
 
-  <body class="controller_<%=controller_name %> controller_<%=action_name %>">
-    <div class="canvas_holder"><canvas class="webgl"></canvas></div>
+  <body class="controller_<%=controller_name %> action_<%=action_name %>">
+    <div class="canvas_holder"></div>
     <div id="app" class="total_wrap">
       <%= render 'shared/header' %>
-
       <div class="content_area">
           <%= yield %>
       </div>
