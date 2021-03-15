@@ -1,7 +1,6 @@
 require("@rails/ujs").start()
 require("@rails/activestorage").start()
 require("channels")
-// require("turbolinks").start()
 require("jquery")
 require("stylesheets/application.scss")
 

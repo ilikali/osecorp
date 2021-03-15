@@ -1,4 +1,4 @@
-import { gsap, TweenLite, TweenMax, Sine } from 'gsap'
+import { gsap, TweenLite, TweenMax, TimelineMax } from 'gsap'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
@@ -11,22 +11,47 @@ import CameraControls from 'camera-controls';
 import Cursor from './cursor';
 
 
-
-
 export default class Sketch{
     constructor(options){
         CameraControls.install({ THREE: THREE });
-        const dracoLoader = new DRACOLoader()
-        dracoLoader.setDecoderPath('/draco/')
+        this.loadingManager = new THREE.LoadingManager(
+            () =>
+            {
+              $(".preloader").fadeOut(800, function(){
+                $(".enter_wrap").fadeIn(800);
+              });
+            },
 
-        const gltfLoader = new GLTFLoader()
-        gltfLoader.setDRACOLoader(dracoLoader)
-        const cubeTextureLoader = new THREE.CubeTextureLoader()
+            (itemUrl, itemsLoaded, itemsTotal) =>
+            {
+              const progressRatio = itemsLoaded / itemsTotal * 100
+              document.querySelector('.preloader_line').style.width = progressRatio+"%"
+            }
+        )
+        this.dracoLoader = new DRACOLoader(this.loadingManager)
+        this.dracoLoader.setDecoderPath('/draco/')
 
+        this.gltfLoader = new GLTFLoader(this.loadingManager)
+        this.gltfLoader.setDRACOLoader(this.dracoLoader)
+        this.cubeTextureLoader = new THREE.CubeTextureLoader(this.loadingManager)
+
+        this.audioLoader = new THREE.AudioLoader(this.loadingManager);
+
+
+        this.environmentMap = this.cubeTextureLoader.load([
+            '/textures/environmentMap/px.png',
+            '/textures/environmentMap/nx.png',
+            '/textures/environmentMap/py.png',
+            '/textures/environmentMap/ny.png',
+            '/textures/environmentMap/pz.png',
+            '/textures/environmentMap/nz.png'
+        ])
+        this.environmentMap.encoding = THREE.sRGBEncoding
 
         this.time = 0;
         this.container = options.dom;
         this.scene = new THREE.Scene();
+        this.scene.environment = this.environmentMap
 
         this.width = this.container.offsetWidth;
         this.height = this.container.offsetHeight;
@@ -50,9 +75,25 @@ export default class Sketch{
 
         this.cameraControls = new CameraControls( this.camera, this.renderer.domElement);
         this.cameraControls.enabled = false;
-
         this.container.appendChild( this.renderer.domElement );
 
+        this.audioListener = new THREE.AudioListener();
+        this.camera.add( this.audioListener );
+        const sound = new THREE.Audio(this.audioListener);
+        this.audioLoader.load( '/sounds/background.ogg', function( buffer ) {
+          sound.setBuffer( buffer );
+          sound.setLoop( true );
+          sound.setVolume( 0.5 );
+          // sound.play();
+        });
+
+
+        document.querySelector('.enter').addEventListener('click', (e)=>{
+          $(".enter_wrap").fadeOut(function(){
+            console.log(1)
+            $(".total_wrap").addClass("show");
+          })
+        });
 
 
         this.popped = ('state' in window.history && window.history.state !== null), this.initialURL = location.href;
@@ -73,29 +114,70 @@ export default class Sketch{
           });
         });
 
-
-
         this.addCursor()
         this.initScene()
         this.resize()
         this.setupResize();
         this.composerPass()
         this.render();
+    }
+
+
+    loadState(url){
+      let that = this
+      $('.fader').fadeIn(100, function(){
+        fetch(url)
+        .then(data => {
+          return data.text()
+        }).then(function(html) {
+          let parser = new DOMParser();
+          let doc = parser.parseFromString(html, "text/html");
+          document.body.classList = doc.body.classList;
+          document.querySelector('.content_area').innerHTML = doc.querySelector('.content_area').innerHTML;
+          that.initScene();
+
+        }).catch(error => {
+          console.log(error)
+        });
+      })
 
 
     }
-    loadState(url){
-      fetch(url)
-      .then(data => {
-        return data.text()
-      }).then(function(html) {
-        let parser = new DOMParser();
-        let doc = parser.parseFromString(html, "text/html");
-        console.log(doc.querySelector('.content_area'))
-        document.querySelector('.content_area').innerHTML = doc.querySelector('.content_area').innerHTML;
-      }).catch(error => {
-        
-      });
+
+    initScene(){
+      $('.fader').fadeOut(500);
+      this.gltfLoader.load(
+          '/models/composition.gltf',
+          (gltf) =>
+          {
+              gltf.scene.scale.set(1, 1, 1)
+              this.scene.add(gltf.scene)
+              // updateAllMaterials()
+              // this.cameraControls.setLookAt( 1, 1.5, 2, -5, 0, -2, true )
+          }
+      )
+
+      // directionalLight.castShadow = true
+      // directionalLight.intensity = 0.3
+      // directionalLight.shadow.camera.far = 15
+      // directionalLight.shadow.mapSize.set(1024, 1024)
+      // directionalLight.shadow.normalBias = 0.05
+      // directionalLight.position.set(0.25, 3, - 2.25)
+      // scene.add(directionalLight)
+      //
+
+      //
+      // const geometry = new THREE.CircleGeometry( 7, 60 );
+      // const groundMirror = new Reflector( geometry, {
+      //   transparent:true,
+      //   clipBias: 0.005,
+      //   textureWidth: window.innerWidth * window.devicePixelRatio,
+      //   textureHeight: window.innerHeight * window.devicePixelRatio,
+      //   color: 0x777777,
+      // });
+      // groundMirror.position.y = 0.01;
+      // groundMirror.rotateX( - Math.PI / 2 );
+      // scene.add( groundMirror );
     }
 
 
@@ -127,40 +209,6 @@ export default class Sketch{
         this.renderer.setSize( this.width,this.height );
         this.camera.aspect = this.width/this.height;
         this.camera.updateProjectionMatrix();
-    }
-
-    initScene(){
-      // directionalLight.castShadow = true
-      // directionalLight.intensity = 0.3
-      // directionalLight.shadow.camera.far = 15
-      // directionalLight.shadow.mapSize.set(1024, 1024)
-      // directionalLight.shadow.normalBias = 0.05
-      // directionalLight.position.set(0.25, 3, - 2.25)
-      // scene.add(directionalLight)
-      //
-      // gltfLoader.load(
-      //     '/models/composition.gltf',
-      //     (gltf) =>
-      //     {
-      //         console.log()
-      //         gltf.scene.scale.set(1, 1, 1)
-      //         scene.add(gltf.scene)
-      //         updateAllMaterials()
-      //         cameraControls.setLookAt( 1, 1.5, 2, -5, 0, -2, true )
-      //     }
-      // )
-      //
-      // const geometry = new THREE.CircleGeometry( 7, 60 );
-      // const groundMirror = new Reflector( geometry, {
-      //   transparent:true,
-      //   clipBias: 0.005,
-      //   textureWidth: window.innerWidth * window.devicePixelRatio,
-      //   textureHeight: window.innerHeight * window.devicePixelRatio,
-      //   color: 0x777777,
-      // });
-      // groundMirror.position.y = 0.01;
-      // groundMirror.rotateX( - Math.PI / 2 );
-      // scene.add( groundMirror );
     }
 
     render(){

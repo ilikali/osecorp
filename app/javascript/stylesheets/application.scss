@@ -128,6 +128,16 @@ height: 0;
     font-display: swap;
 }
 
+
+.total_wrap {
+opacity: 0;
+transition:all 1s cubic-bezier(.52,.01,.16,1);
+}
+
+.total_wrap.show {
+opacity: 1;
+}
+
 .canvas_holder {
 width: 100%;
 height: 100vh;
@@ -147,6 +157,8 @@ justify-content: space-between;
 box-sizing: border-box;
 padding: 40px;
 align-items: center;
+z-index: 10;
+mix-blend-mode: screen;
 }
 
 .head_right ul {
@@ -184,7 +196,6 @@ margin: 0 10px 0 0;
 
 .logo_self video{
 width: 100%;
-mix-blend-mode: screen;
 }
 
 .type {
@@ -203,6 +214,7 @@ left: 0px;
 justify-content: space-between;
 padding: 0 40px 40px 40px;
 box-sizing: border-box;
+z-index: 10;
 }
 
 .copyright {
@@ -291,9 +303,134 @@ display: none;
 }
 
 
+.content_area {
+width: 100vw;
+height: 100vh;
+background: blue;
+}
+
+.fader {
+background: black;
+width: 100%;
+height: 100%;
+position: fixed;
+top:0px;
+left:0px;
+z-index: 2;
+display: none;
+}
+
+.preloader {
+background: black;
+width: 100%;
+height: 100%;
+position: fixed;
+top:0px;
+left:0px;
+z-index: 1000;
+}
+
+.preloader_holder {
+width: 200px;
+}
+
+.preloader_self {
+width: 100%;
+background: rgba(255,255,255,0.2);
+height: 2px;
+position: relative;
+border-radius: 10px;
+}
+
+.preloader_line {
+width: 0;
+height: 100%;
+position: absolute;
+left: 0px;
+top:0px;
+background: white;
+border-radius: 10px;
+box-shadow: 0 0px 30px rgba(255,255,255,1);
+transition: width 0.5s;
+}
+
+.enter_wrap {
+background: black;
+width: 100%;
+height: 100%;
+position: fixed;
+top:0px;
+left:0px;
+z-index: 999;
+}
+
+.enter_wrap {
+display: none;
+}
+
+
+.ew_flex {
+position: absolute;
+width: 100%;
+height: 100%;
+position: absolute;
+top:0px;
+left:0px;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+.enter {
+width: 170px;
+height: 170px;
+position: relative;
+}
+
+.e_text {
+width: calc(100% - 8px);
+height: calc(100% - 8px);
+position: absolute;
+top:0px;
+left:0px;
+z-index: 2;
+display: flex;
+align-items: center;
+justify-content: center;
+color:white;
+font-family: 'r';
+font-size: 25px;
+background:url(img/enter.svg) no-repeat center black;
+top:4px;
+left: 4px;
+border-radius: 100%;
+transition:all .5s cubic-bezier(.52,.01,.16,1);
+transform:scale(1);
+}
+
+.enter:hover .e_text{
+transform:scale(0.95);
+}
+
+.e_bg {
+width: 100%;
+height: 100%;
+border-radius: 100%;
+background: url(img/eg_bg.jpg) no-repeat center center;
+animation: rotating 20s linear infinite;
+background-size: 300%;
+}
 
 
 
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 @media screen and (max-width: 1000px) {
 

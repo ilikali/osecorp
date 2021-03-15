@@ -26,12 +26,29 @@
   </head>
 
   <body class="controller_<%=controller_name %> action_<%=action_name %>">
-    <div class="canvas_holder"></div>
-    <div id="app" class="total_wrap">
-      <%= render 'shared/header' %>
-      <div class="content_area">
-          <%= yield %>
+
+    <div class="preloader">
+      <div class="ew_flex">
+        <div class="preloader_holder">
+          <div class="preloader_self">
+            <div class="preloader_line"></div>
+          </div>
+        </div>
       </div>
+    </div>
+    <div class="enter_wrap">
+      <div class="ew_flex">
+        <button class="enter">
+          <div class="e_text"></div>
+          <div class="e_bg"></div>
+        </button>
+      </div>
+    </div>
+    <div class="total_wrap">
+      <%= render 'shared/header' %>
+      <div class="fader"></div>
+      <div class="canvas_holder"></div>
+      <div class="content_area"><%= yield %></div>
       <%= render 'shared/footer' %>
     </div>
   </body>
