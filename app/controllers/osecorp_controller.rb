@@ -7,4 +7,17 @@ class OsecorpController < ApplicationController
   def about
 
   end
+
+  def works
+
+  end
+
+  def partners
+
+  end
+
+  def contacts
+
+  end
+  
 end

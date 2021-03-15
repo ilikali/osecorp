@@ -2803,7 +2803,7 @@ eventemitter3@^4.0.0:
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
 
-events@^3.0.0:
+events@^3.0.0, events@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
   integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==
@@ -3325,6 +3325,11 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2:
   version "4.2.6"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.6.tgz#ff040b2b0853b23c3d31027523706f1885d76bee"
   integrity sha512-nTnJ528pbqxYanhpDYsi4Rd8MAeaBA67+RZ10CM1m3bTAVFEDcd5AuA4a6W5YkGZ1iNXHzZz8T6TBKLeBuNriQ==
+
+gsap@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/gsap/-/gsap-3.6.0.tgz#925f25370c698ce0f6ea563522da8f6b5ed21b0a"
+  integrity sha512-0P3syv1TmYr+A/VZ8UMFzw+s0XoaKSzzDFs8NqkXiJTXI4E/VTi0zRjPgxaPBpiUPPycgRnFjLDe0Tb4dRRf+w==
 
 handle-thing@^2.0.0:
   version "2.0.1"
@@ -5890,6 +5895,11 @@ postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.14, postcss@^7.0.17, postcss@^7.0.2
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
+postprocessing@^6.21.1:
+  version "6.21.1"
+  resolved "https://registry.yarnpkg.com/postprocessing/-/postprocessing-6.21.1.tgz#565d3c7809767085c734c18c477e1bcdbbfc7bbd"
+  integrity sha512-b+ztV3kBLWQSXkaGBUH5FwPmQOZcactEwLDWZzI4kZzKVR4z0Tb+KEkq8FLoFeL5MD9i4RE8PDUNfZXI0UhwwQ==
+
 prepend-http@^1.0.0:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-1.0.4.tgz#d4f4562b0ce3696e41ac52d0e002e57a635dc6dc"
@@ -7198,6 +7208,16 @@ turbolinks@^5.2.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/turbolinks/-/turbolinks-5.2.0.tgz#e6877a55ea5c1cb3bb225f0a4ae303d6d32ff77c"
   integrity sha512-pMiez3tyBo6uRHFNNZoYMmrES/IaGgMhQQM+VFF36keryjb5ms0XkVpmKHkfW/4Vy96qiGW3K9bz0tF5sK9bBw==
+
+tween@^0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/tween/-/tween-0.9.0.tgz#f856c7a9c9ab85ca9a2bc02282591aa2513a20ed"
+  integrity sha1-+FbHqcmrhcqaK8AiglkaolE6IO0=
+
+tweenjs@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/tweenjs/-/tweenjs-1.0.2.tgz#768869c4d4ba91fdb4c5ccc661969c58138555af"
+  integrity sha512-WnFozCNkUkmJtLqJyGrToxVojW2Srzudktr8BzFKQijQRVcmlq7Fc+qfo75ccnwIJGiRWbXKfg7qU67Tzbb1bg==
 
 tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"

@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Goldman-Regular';
+    src: url('Goldman-Regular.woff2') format('woff2'),
+        url('Goldman-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+

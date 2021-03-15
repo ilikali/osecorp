@@ -1,18 +1,22 @@
 <header>
-    <div class="main_wrap">
-      <div class="head_left">
-        <%= link_to root_path, class: "logo" do %>
-          <div class="logo_self">
-            <video poster="" muted="" loop="" class="video" autoplay="" playsinline="">
-								<source src="<%= asset_url('logo.mp4') %>" type="video/mp4">
-						</video>
-          </div>
-          <div class="type"></div>
-        <% end %>
-      </div>
-      <div class="head_right">
-        <nav>
+    <div class="head_left">
+      <%= link_to root_path, class: "logo" do %>
+        <div class="logo_self">
+          <video poster="" muted="" loop="" class="video" autoplay="" playsinline="">
+							<source src="<%= asset_url('logo.mp4') %>" type="video/mp4">
+					</video>
+        </div>
+        <div class="type"></div>
+      <% end %>
+    </div>
+    <div class="head_right">
+      <nav>
+        <ul>
           <li><%= link_to "About", about_path %></li>
-      </div>
+          <li><%= link_to "Works", works_path %></li>
+          <li><%= link_to "Parters", parters_path %></li>
+          <li><%= link_to "Contacts", contacts_path %></li>
+        </ul>
+
     </div>
 </header>
