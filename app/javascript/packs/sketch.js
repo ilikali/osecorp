@@ -10,38 +10,58 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import CameraControls from 'camera-controls';
 import Cursor from './cursor';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 const TWEEN = require('@tweenjs/tween.js')
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+
 
 
 export default class Sketch{
     constructor(options){
 
         this.gui = new dat.GUI({
-          width: 200,
+          width: 900,
           closed: true
         })
         this.debugObject = {}
 
         CameraControls.install({ THREE: THREE });
-        let loaded_manager = 1
-        // this.loadingManager = new THREE.LoadingManager()
-        this.loadingManager = new THREE.LoadingManager(
-            () =>
-            {
-              if(loaded_manager) {
-                $(".preloader").fadeOut(800, function(){
-                  $(".enter_wrap").fadeIn(800);
-                  loaded_manager = 0
-                });
-              }
-            },
 
-            (itemUrl, itemsLoaded, itemsTotal) =>
-            {
-              const progressRatio = itemsLoaded / itemsTotal * 100
-              document.querySelector('.preloader_line').style.width = progressRatio+"%"
-            }
-        )
+        this.audioListener = new THREE.AudioListener();
+        const sound = new THREE.Audio(this.audioListener);
+
+        let loaded_manager = 1
+
+        if(options.showLoader){
+          this.loadingManager = new THREE.LoadingManager(
+              () =>
+              {
+                if(loaded_manager) {
+                  $(".preloader").fadeOut(800, function(){
+                    $(".enter_wrap").fadeIn(800);
+                    loaded_manager = 0
+                  });
+                }
+              },
+
+              (itemUrl, itemsLoaded, itemsTotal) =>
+              {
+                const progressRatio = itemsLoaded / itemsTotal * 100
+                document.querySelector('.preloader_line').style.width = progressRatio+"%"
+              }
+          );
+          document.querySelector('.enter').addEventListener('click', (e)=>{
+            $(".enter_wrap").fadeOut(function(){
+              $(".total_wrap").addClass("show");
+              sound.play();
+            })
+          });
+        }else {
+          this.loadingManager = new THREE.LoadingManager()
+          document.querySelector('.preloader_things').style.display = 'none';
+          document.querySelector('.total_wrap').classList.add("show");
+          // this.gui.closed = false
+        }
         this.dracoLoader = new DRACOLoader(this.loadingManager)
         this.dracoLoader.setDecoderPath('/draco/')
 
@@ -50,8 +70,6 @@ export default class Sketch{
         this.cubeTextureLoader = new THREE.CubeTextureLoader(this.loadingManager)
 
         this.audioLoader = new THREE.AudioLoader(this.loadingManager);
-
-
         this.environmentMap = this.cubeTextureLoader.load([
             '/textures/environmentMap/px.png',
             '/textures/environmentMap/nx.png',
@@ -95,9 +113,11 @@ export default class Sketch{
 
         this.container.appendChild( this.renderer.domElement );
 
-        this.audioListener = new THREE.AudioListener();
+        this.stats = new Stats()
+        this.stats.showPanel(0)
+        document.body.appendChild(this.stats.dom)
+
         this.camera.add( this.audioListener );
-        const sound = new THREE.Audio(this.audioListener);
         this.audioLoader.load( '/sounds/background.ogg', function( buffer ) {
           sound.setBuffer( buffer );
           sound.setLoop( true );
@@ -106,12 +126,7 @@ export default class Sketch{
         });
 
 
-        document.querySelector('.enter').addEventListener('click', (e)=>{
-          $(".enter_wrap").fadeOut(function(){
-            $(".total_wrap").addClass("show");
-            sound.play();
-          })
-        });
+
 
 
         this.popped = ('state' in window.history && window.history.state !== null), this.initialURL = location.href;
@@ -144,6 +159,13 @@ export default class Sketch{
         //   console.log('MozMousePixelScroll')
         // })
 
+
+        /* -------------------- bloomPass params  --------------------  */
+        this.ENTIRE_SCENE = 0;
+        this.BLOOM_SCENE = 1;
+        this.bloomLayer = new THREE.Layers();
+        this.bloomLayer.set( this.BLOOM_SCENE );
+        this.materials = {};
 
 
         this.initScene();
@@ -184,7 +206,6 @@ export default class Sketch{
       }
 
       if (document.body.classList.contains('action_home')) {
-
 
 
 
@@ -237,7 +258,8 @@ export default class Sketch{
 
                 light_1 = gltf.scene.children[4]
                 light_2 = gltf.scene.children[5]
-                light_2.material = new THREE.MeshBasicMaterial();
+                light_2.material = new THREE.MeshBasicMaterial( { color: 0x006FFF } );
+                light_2.layers.enable( this.BLOOM_SCENE );
                 this.scene.add(gltf.scene)
                 this.updateAllMaterials()
             }
@@ -247,23 +269,22 @@ export default class Sketch{
 
         setTimeout(function(){
           gsap.to( camera.position, {
-          	duration: 4,
+          	duration: 0.1,
           	x: 2.2,
           	y: 0.9,
           	z: 2.6,
             ease: "power4.inOut"
           });
           gsap.to( camera.rotation, {
-          	duration: 4,
+          	duration: 0.1,
           	x: THREE.Math.degToRad(0),
           	y: THREE.Math.degToRad(60),
           	z: THREE.Math.degToRad(0),
             ease: "power4.inOut"
           });
-        },2500)
+        },1)
 
         document.querySelector('.scroll_1').addEventListener('click', (e)=>{
-
           gsap.to( camera.position, {
           	duration: 4,
           	x: 2.2,
@@ -299,13 +320,12 @@ export default class Sketch{
 
         this.camera.rotation.x = THREE.Math.degToRad(-90)
 
-
         let that = this
-        this.debugObject.positionX = 0.22
-        this.debugObject.positionY = 1.8
-        this.debugObject.positionZ = 0.05
-        this.debugObject.targetX = -10
-        this.debugObject.targetY = 80
+        this.debugObject.positionX = 2.2
+        this.debugObject.positionY = 0.9
+        this.debugObject.positionZ = 2.6
+        this.debugObject.targetX = 0
+        this.debugObject.targetY = 60
         this.debugObject.targetZ = 0
         this.gui.add(this.debugObject, 'positionX').min(-20).max(20).step(0.0001).onChange(function(){
           that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
@@ -325,7 +345,6 @@ export default class Sketch{
           that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
           that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
         })
-
         this.gui.add(this.debugObject, 'targetX').min(-180).max(180).step(1).onChange(function(){
           that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
           that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
@@ -347,51 +366,6 @@ export default class Sketch{
 
 
 
-        // this.gui.add(this.debugObject, 'positionY').min(-10).max(10).step(0.001).onChange(function(){
-        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
-        // })
-        // this.gui.add(this.debugObject, 'positionZ').min(-10).max(10).step(0.001).onChange(function(){
-        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
-        // })
-        //
-        // this.gui.add(this.debugObject, 'targetX').min(-10).max(10).step(0.001).onChange(function(){
-        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
-        // })
-        // this.gui.add(this.debugObject, 'targetY').min(-10).max(10).step(0.001).onChange(function(){
-        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
-        // })
-        // this.gui.add(this.debugObject, 'targetZ').min(-10).max(10).step(0.001).onChange(function(){
-        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
-        // })
-
-        // let that = this
-        // this.debugObject.positionX = -0.069
-        // this.debugObject.positionY = 1.881
-        // this.debugObject.positionZ = -0.089
-        // this.debugObject.targetX = -10
-        // this.debugObject.targetY = -1.153
-        // this.debugObject.targetZ = -6.356
-        // this.gui.add(this.debugObject, 'positionX').min(-10).max(10).step(0.001).onChange(function(){
-        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
-        // })
-        // this.gui.add(this.debugObject, 'positionY').min(-10).max(10).step(0.001).onChange(function(){
-        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
-        // })
-        // this.gui.add(this.debugObject, 'positionZ').min(-10).max(10).step(0.001).onChange(function(){
-        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
-        // })
-        //
-        // this.gui.add(this.debugObject, 'targetX').min(-10).max(10).step(0.001).onChange(function(){
-        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
-        // })
-        // this.gui.add(this.debugObject, 'targetY').min(-10).max(10).step(0.001).onChange(function(){
-        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
-        // })
-        // this.gui.add(this.debugObject, 'targetZ').min(-10).max(10).step(0.001).onChange(function(){
-        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
-        // })
-
-
         this.directionalLight = new THREE.DirectionalLight('#ffffff', 3)
         this.directionalLight.castShadow = true
         this.directionalLight.intensity = 0.3
@@ -401,16 +375,17 @@ export default class Sketch{
         this.directionalLight.position.set(0.25, 3, - 2.25)
         this.scene.add(this.directionalLight)
 
-        const geometry = new THREE.CircleGeometry( 7, 60 );
-        const groundMirror = new Reflector( geometry, {
-        	clipBias: 0.005,
-        	textureWidth: window.innerWidth * window.devicePixelRatio,
-        	textureHeight: window.innerHeight * window.devicePixelRatio,
-        	color: 0x777777
-        });
-        groundMirror.position.y = 0.01;
-        groundMirror.rotateX( - Math.PI / 2 );
-        this.scene.add( groundMirror );
+
+        // const geometry = new THREE.CircleGeometry( 7, 60 );
+        // const groundMirror = new Reflector( geometry, {
+        // 	clipBias: 0.005,
+        // 	textureWidth: window.innerWidth * window.devicePixelRatio,
+        // 	textureHeight: window.innerHeight * window.devicePixelRatio,
+        // 	color: 0x777777
+        // });
+        // groundMirror.position.y = 0.01;
+        // groundMirror.rotateX( - Math.PI / 2 );
+        // this.scene.add( groundMirror );
 
       }
 
@@ -420,12 +395,9 @@ export default class Sketch{
 
 
     updateAllMaterials(){
-      this.scene.traverse((child) =>
-      {
-          if(child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial)
-          {
-              // child.material.envMap = environmentMap
-              child.material.envMapIntensity = 0.2
+      this.scene.traverse((child) => {
+          if(child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
+              child.material.envMapIntensity = 1
               child.material.needsUpdate = true
               child.castShadow = true
               child.receiveShadow = true
@@ -446,9 +418,111 @@ export default class Sketch{
     }
 
     composerPass(){
-      this.composer = new EffectComposer(this.renderer);
-      this.renderPass = new RenderPass(this.scene, this.camera);
-      this.composer.addPass(this.renderPass);
+      let params = {
+      	exposure: 1,
+      	bloomStrength: 1,
+      	bloomThreshold: 0,
+      	bloomRadius: 0.5,
+      	scene: "Scene with Glow"
+      };
+
+      this.renderScene = new RenderPass( this.scene, this.camera );
+
+      this.bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+      this.bloomPass.threshold = params.bloomThreshold;
+      this.bloomPass.strength = params.bloomStrength;
+      this.bloomPass.radius = params.bloomRadius;
+
+      this.bloomComposer = new EffectComposer( this.renderer );
+      this.bloomComposer.renderToScreen = false;
+      this.bloomComposer.addPass( this.renderScene );
+      this.bloomComposer.addPass( this.bloomPass );
+
+      this.finalPass = new ShaderPass(
+      	new THREE.ShaderMaterial( {
+      		uniforms: {
+      			baseTexture: { value: null },
+      			bloomTexture: { value: this.bloomComposer.renderTarget2.texture }
+      		},
+      		vertexShader: `
+          varying vec2 vUv;
+
+      			void main() {
+
+      				vUv = uv;
+
+      				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+      			}
+          `,
+      		fragmentShader: `
+          uniform sampler2D baseTexture;
+      			uniform sampler2D bloomTexture;
+
+      			varying vec2 vUv;
+
+      			void main() {
+
+      				gl_FragColor = ( texture2D( baseTexture, vUv ) + vec4( 1.0 ) * texture2D( bloomTexture, vUv ) );
+
+      			}`,
+      		defines: {}
+      	} ), "baseTexture"
+      );
+      this.finalPass.needsSwap = true;
+
+      this.composer = new EffectComposer( this.renderer );
+      this.composer.addPass( this.renderScene );
+      this.composer.addPass( this.finalPass );
+
+      // this.composer = new EffectComposer(this.renderer);
+      // this.renderPass = new RenderPass(this.scene, this.camera);
+      // this.composer.addPass(this.renderPass);
+      //
+
+      //
+      // this.bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+      // this.bloomPass.threshold = params.bloomThreshold;
+      // this.bloomPass.strength = params.bloomStrength;
+      // this.bloomPass.radius = params.bloomRadius;
+      //
+      // this.composer.renderToScreen = false;
+      // this.composer.addPass( this.renderPass );
+      // this.composer.addPass( this.bloomPass );
+      //
+      // this.finalPass = new ShaderPass(
+      // 	new THREE.ShaderMaterial( {
+      // 		uniforms: {
+      // 			baseTexture: { value: null },
+      // 			bloomTexture: { value: this.composer.renderTarget2.texture }
+      // 		},
+      // 		vertexShader: `
+      //     varying vec2 vUv;
+      //
+      // 			void main() {
+      //
+      // 				vUv = uv;
+      //
+      // 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+      //
+      // 			}
+      //     `,
+      // 		fragmentShader: `
+      //     uniform sampler2D baseTexture;
+      // 			uniform sampler2D bloomTexture;
+      //
+      // 			varying vec2 vUv;
+      //
+      // 			void main() {
+      //
+      // 				gl_FragColor = ( texture2D( baseTexture, vUv ) + vec4( 1.0 ) * texture2D( bloomTexture, vUv ) );
+      //
+      // 			}`,
+      // 		defines: {}
+      // 	} ), "baseTexture"
+      // );
+      // this.finalPass.needsSwap = true;
+      // this.composer.addPass( this.finalPass );
     }
 
     setupResize(){
@@ -463,15 +537,41 @@ export default class Sketch{
         this.camera.updateProjectionMatrix();
     }
 
+    darkenNonBloomed() {
+      this.scene.traverse((child) => {
+        if ( child.isMesh && this.bloomLayer.test( child.layers ) === false ) {
+          this.materials[ child.uuid ] = child.material;
+          child.material = new THREE.MeshBasicMaterial( { color: "black" } );
+        }
+      })
+    }
+
+    restoreMaterial() {
+      this.scene.traverse((child) => {
+      	if ( this.materials[ child.uuid ] ) {
+      		child.material = this.materials[ child.uuid ];
+      		delete this.materials[ child.uuid ];
+      	}
+      })
+    }
+
+
     render(){
+
+        this.stats.begin()
+
         const elapsedTime = this.clock.getElapsedTime()
         const deltaTime = elapsedTime - this.previousTime
         this.previousTime = elapsedTime
-
         this.time+=0.05;
-        // this.cameraControls.update(deltaTime);
-
+        this.darkenNonBloomed()
+    		this.bloomComposer.render();
+    		this.restoreMaterial()
         this.composer.render()
+
         window.requestAnimationFrame(this.render.bind(this));
+
+        this.stats.end()
+
     }
 }

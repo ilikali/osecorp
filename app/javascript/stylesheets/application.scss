@@ -434,7 +434,6 @@ color:white;
 font-size: 20px;
 }
 
-
 .dg.ac {
 z-index: 9999999999999;
 }
@@ -448,6 +447,29 @@ z-index: 9999999999999;
   to {
     transform: rotate(360deg);
   }
+}
+
+.home_page_holder {
+position: absolute;
+width: 100%;
+height: 100%;
+top:0px;
+left:0px;
+}
+
+.home_scroll_item {
+position: absolute;
+width: 100%;
+height: 100%;
+top:0px;
+left:0px;
+}
+
+.scroll_content {
+max-width: 1200px;
+margin: 0 auto;
+height: 100%;
+display: flex;
 }
 
 @media screen and (max-width: 1000px) {

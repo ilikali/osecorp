@@ -9,6 +9,7 @@ import Sketch from './sketch';
 
 $(document).ready(function() {
   new Sketch({
-      dom: document.querySelector('.canvas_holder')
+      dom: document.querySelector('.canvas_holder'),
+      showLoader: true
   });
 })
