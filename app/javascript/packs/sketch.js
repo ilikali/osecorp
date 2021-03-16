@@ -1,5 +1,6 @@
-import { gsap, TweenLite, TweenMax, TimelineMax } from 'gsap'
+import { gsap, Power2 } from 'gsap'
 import * as THREE from 'three'
+import * as dat from 'dat.gui'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
@@ -9,17 +10,30 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import CameraControls from 'camera-controls';
 import Cursor from './cursor';
+const TWEEN = require('@tweenjs/tween.js')
 
 
 export default class Sketch{
     constructor(options){
+
+        this.gui = new dat.GUI({
+          width: 200,
+          closed: true
+        })
+        this.debugObject = {}
+
         CameraControls.install({ THREE: THREE });
+        let loaded_manager = 1
+        // this.loadingManager = new THREE.LoadingManager()
         this.loadingManager = new THREE.LoadingManager(
             () =>
             {
-              $(".preloader").fadeOut(800, function(){
-                $(".enter_wrap").fadeIn(800);
-              });
+              if(loaded_manager) {
+                $(".preloader").fadeOut(800, function(){
+                  $(".enter_wrap").fadeIn(800);
+                  loaded_manager = 0
+                });
+              }
             },
 
             (itemUrl, itemsLoaded, itemsTotal) =>
@@ -49,6 +63,9 @@ export default class Sketch{
         this.environmentMap.encoding = THREE.sRGBEncoding
 
         this.time = 0;
+        this.clock = new THREE.Clock()
+        this.previousTime = 0
+
         this.container = options.dom;
         this.scene = new THREE.Scene();
         this.scene.environment = this.environmentMap
@@ -56,8 +73,8 @@ export default class Sketch{
         this.width = this.container.offsetWidth;
         this.height = this.container.offsetHeight;
 
-        this.camera = new THREE.PerspectiveCamera(65, this.width / this.height, 0.1, 100)
-        this.camera.position.set(0, 10, 0)
+        this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.1, 100)
+        this.camera.position.set(0, 20, 0)
         this.camera.lookAt(0, 0, 0)
 
         this.renderer = new THREE.WebGLRenderer({
@@ -75,6 +92,7 @@ export default class Sketch{
 
         this.cameraControls = new CameraControls( this.camera, this.renderer.domElement);
         this.cameraControls.enabled = false;
+
         this.container.appendChild( this.renderer.domElement );
 
         this.audioListener = new THREE.AudioListener();
@@ -83,15 +101,15 @@ export default class Sketch{
         this.audioLoader.load( '/sounds/background.ogg', function( buffer ) {
           sound.setBuffer( buffer );
           sound.setLoop( true );
-          sound.setVolume( 0.5 );
+          sound.setVolume( 0.2 );
           // sound.play();
         });
 
 
         document.querySelector('.enter').addEventListener('click', (e)=>{
           $(".enter_wrap").fadeOut(function(){
-            console.log(1)
             $(".total_wrap").addClass("show");
+            sound.play();
           })
         });
 
@@ -114,18 +132,32 @@ export default class Sketch{
           });
         });
 
-        this.addCursor()
-        this.initScene()
-        this.resize()
+        // window.addEventListener('mousewheel', (e)=>{
+        //   console.log('mousewheel')
+        // })
+        //
+        // window.addEventListener('DOMMouseScroll', (e)=>{
+        //   console.log('DOMMouseScroll')
+        // })
+        //
+        // window.addEventListener('MozMousePixelScroll', (e)=>{
+        //   console.log('MozMousePixelScroll')
+        // })
+
+
+
+        this.initScene();
+        this.addCursor();
+        this.resize();
         this.setupResize();
-        this.composerPass()
+        this.composerPass();
         this.render();
     }
 
 
     loadState(url){
       let that = this
-      $('.fader').fadeIn(100, function(){
+      $('.fader').fadeIn(1000, function(){
         fetch(url)
         .then(data => {
           return data.text()
@@ -145,41 +177,261 @@ export default class Sketch{
     }
 
     initScene(){
-      $('.fader').fadeOut(500);
-      this.gltfLoader.load(
-          '/models/composition.gltf',
-          (gltf) =>
-          {
-              gltf.scene.scale.set(1, 1, 1)
-              this.scene.add(gltf.scene)
-              // updateAllMaterials()
-              // this.cameraControls.setLookAt( 1, 1.5, 2, -5, 0, -2, true )
-          }
-      )
+      $('.fader').fadeOut(1000);
 
-      // directionalLight.castShadow = true
-      // directionalLight.intensity = 0.3
-      // directionalLight.shadow.camera.far = 15
-      // directionalLight.shadow.mapSize.set(1024, 1024)
-      // directionalLight.shadow.normalBias = 0.05
-      // directionalLight.position.set(0.25, 3, - 2.25)
-      // scene.add(directionalLight)
-      //
+      while(this.scene.children.length > 0){
+        this.scene.remove(this.scene.children[0]);
+      }
 
-      //
-      // const geometry = new THREE.CircleGeometry( 7, 60 );
-      // const groundMirror = new Reflector( geometry, {
-      //   transparent:true,
-      //   clipBias: 0.005,
-      //   textureWidth: window.innerWidth * window.devicePixelRatio,
-      //   textureHeight: window.innerHeight * window.devicePixelRatio,
-      //   color: 0x777777,
-      // });
-      // groundMirror.position.y = 0.01;
-      // groundMirror.rotateX( - Math.PI / 2 );
-      // scene.add( groundMirror );
+      if (document.body.classList.contains('action_home')) {
+
+
+
+
+        // function myHandler(event, delta) {
+        //     if (event.originalEvent.wheelDelta > 0) {
+        //         $("body.action_home").unbind('mousewheel', myHandler);
+        //         go_to_slide("prev")
+        //     } else {
+        //         $("body.action_home").unbind('mousewheel', myHandler)
+        //         go_to_slide("next")
+        //     }
+        // }
+        //
+        // function go_to_slide(direction) {
+        //     console.log(direction)
+        //     if (direction == "prev") {
+        //
+        //     } else {
+        //
+        //     }
+        //
+        //     setTimeout(function () {
+        //         $("body.action_home").bind("mousewheel", myHandler);
+        //         $("body").addClass("for_scroll");
+        //     }, 2050);
+        // }
+        //
+        // $("body.action_home").bind("mousewheel", myHandler);
+
+
+        // scroll start
+        // this.cameraControls.setLookAt( 1, 1.5, 2, -5, 0, -2, true )
+
+        // scroll first
+        // this.cameraControls.setLookAt( -0.017, 1.768, -0.017, -10, 1.301, -3.418, true )
+
+        let men, light_1, light_2;
+
+        this.gltfLoader.load(
+            '/models/composition.gltf',
+            (gltf) =>
+            {
+                gltf.scene.scale.set(1, 1, 1);
+                men = gltf.scene.children[3];
+                // men.material = new THREE.MeshStandardMaterial({
+                //     color: 0x000000,
+                //     metalness: 20,
+                //     roughness: 20
+                // });
+
+                light_1 = gltf.scene.children[4]
+                light_2 = gltf.scene.children[5]
+                light_2.material = new THREE.MeshBasicMaterial();
+                this.scene.add(gltf.scene)
+                this.updateAllMaterials()
+            }
+        )
+
+        let camera = this.camera
+
+        setTimeout(function(){
+          gsap.to( camera.position, {
+          	duration: 4,
+          	x: 2.2,
+          	y: 0.9,
+          	z: 2.6,
+            ease: "power4.inOut"
+          });
+          gsap.to( camera.rotation, {
+          	duration: 4,
+          	x: THREE.Math.degToRad(0),
+          	y: THREE.Math.degToRad(60),
+          	z: THREE.Math.degToRad(0),
+            ease: "power4.inOut"
+          });
+        },2500)
+
+        document.querySelector('.scroll_1').addEventListener('click', (e)=>{
+
+          gsap.to( camera.position, {
+          	duration: 4,
+          	x: 2.2,
+          	y: 0.9,
+          	z: 2.6,
+            ease: "power4.inOut"
+          });
+          gsap.to( camera.rotation, {
+          	duration: 4,
+          	x: THREE.Math.degToRad(0),
+          	y: THREE.Math.degToRad(60),
+          	z: THREE.Math.degToRad(0),
+            ease: "power4.inOut"
+          });
+        });
+
+        document.querySelector('.scroll_2').addEventListener('click', (e)=>{
+          gsap.to( camera.position, {
+          	duration: 4,
+          	x: 0.22,
+          	y: 1.8,
+          	z: 0.05,
+            ease: "power4.inOut"
+          });
+          gsap.to( camera.rotation, {
+          	duration: 4,
+          	x: THREE.Math.degToRad(-10),
+          	y: THREE.Math.degToRad(80),
+          	z: THREE.Math.degToRad(0),
+            ease: "power4.inOut"
+          });
+        });
+
+        this.camera.rotation.x = THREE.Math.degToRad(-90)
+
+
+        let that = this
+        this.debugObject.positionX = 0.22
+        this.debugObject.positionY = 1.8
+        this.debugObject.positionZ = 0.05
+        this.debugObject.targetX = -10
+        this.debugObject.targetY = 80
+        this.debugObject.targetZ = 0
+        this.gui.add(this.debugObject, 'positionX').min(-20).max(20).step(0.0001).onChange(function(){
+          that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
+          that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
+          that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
+          that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
+        })
+        this.gui.add(this.debugObject, 'positionY').min(-20).max(20).step(0.0001).onChange(function(){
+          that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
+          that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
+          that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
+          that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
+        })
+        this.gui.add(this.debugObject, 'positionZ').min(-20).max(20).step(0.0001).onChange(function(){
+          that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
+          that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
+          that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
+          that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
+        })
+
+        this.gui.add(this.debugObject, 'targetX').min(-180).max(180).step(1).onChange(function(){
+          that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
+          that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
+          that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
+          that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
+        })
+        this.gui.add(this.debugObject, 'targetY').min(-180).max(180).step(1).onChange(function(){
+          that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
+          that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
+          that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
+          that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
+        })
+        this.gui.add(this.debugObject, 'targetZ').min(-180).max(180).step(1).onChange(function(){
+          that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
+          that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
+          that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
+          that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
+        })
+
+
+
+        // this.gui.add(this.debugObject, 'positionY').min(-10).max(10).step(0.001).onChange(function(){
+        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
+        // })
+        // this.gui.add(this.debugObject, 'positionZ').min(-10).max(10).step(0.001).onChange(function(){
+        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
+        // })
+        //
+        // this.gui.add(this.debugObject, 'targetX').min(-10).max(10).step(0.001).onChange(function(){
+        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
+        // })
+        // this.gui.add(this.debugObject, 'targetY').min(-10).max(10).step(0.001).onChange(function(){
+        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
+        // })
+        // this.gui.add(this.debugObject, 'targetZ').min(-10).max(10).step(0.001).onChange(function(){
+        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
+        // })
+
+        // let that = this
+        // this.debugObject.positionX = -0.069
+        // this.debugObject.positionY = 1.881
+        // this.debugObject.positionZ = -0.089
+        // this.debugObject.targetX = -10
+        // this.debugObject.targetY = -1.153
+        // this.debugObject.targetZ = -6.356
+        // this.gui.add(this.debugObject, 'positionX').min(-10).max(10).step(0.001).onChange(function(){
+        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
+        // })
+        // this.gui.add(this.debugObject, 'positionY').min(-10).max(10).step(0.001).onChange(function(){
+        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
+        // })
+        // this.gui.add(this.debugObject, 'positionZ').min(-10).max(10).step(0.001).onChange(function(){
+        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
+        // })
+        //
+        // this.gui.add(this.debugObject, 'targetX').min(-10).max(10).step(0.001).onChange(function(){
+        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
+        // })
+        // this.gui.add(this.debugObject, 'targetY').min(-10).max(10).step(0.001).onChange(function(){
+        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
+        // })
+        // this.gui.add(this.debugObject, 'targetZ').min(-10).max(10).step(0.001).onChange(function(){
+        //   that.cameraControls.setLookAt(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ, that.debugObject.targetX, that.debugObject.targetY, that.debugObject.targetZ, true )
+        // })
+
+
+        this.directionalLight = new THREE.DirectionalLight('#ffffff', 3)
+        this.directionalLight.castShadow = true
+        this.directionalLight.intensity = 0.3
+        this.directionalLight.shadow.camera.far = 15
+        this.directionalLight.shadow.mapSize.set(1024, 1024)
+        this.directionalLight.shadow.normalBias = 0.05
+        this.directionalLight.position.set(0.25, 3, - 2.25)
+        this.scene.add(this.directionalLight)
+
+        const geometry = new THREE.CircleGeometry( 7, 60 );
+        const groundMirror = new Reflector( geometry, {
+        	clipBias: 0.005,
+        	textureWidth: window.innerWidth * window.devicePixelRatio,
+        	textureHeight: window.innerHeight * window.devicePixelRatio,
+        	color: 0x777777
+        });
+        groundMirror.position.y = 0.01;
+        groundMirror.rotateX( - Math.PI / 2 );
+        this.scene.add( groundMirror );
+
+      }
+
     }
 
+
+
+
+    updateAllMaterials(){
+      this.scene.traverse((child) =>
+      {
+          if(child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial)
+          {
+              // child.material.envMap = environmentMap
+              child.material.envMapIntensity = 0.2
+              child.material.needsUpdate = true
+              child.castShadow = true
+              child.receiveShadow = true
+          }
+      })
+    }
 
     addCursor(){
       const cursor = new Cursor(document.querySelector('.cursor'));
@@ -212,6 +464,10 @@ export default class Sketch{
     }
 
     render(){
+        const elapsedTime = this.clock.getElapsedTime()
+        const deltaTime = elapsedTime - this.previousTime
+        this.previousTime = elapsedTime
+
         this.time+=0.05;
         // this.cameraControls.update(deltaTime);
 

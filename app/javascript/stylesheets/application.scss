@@ -12,7 +12,7 @@ background: transparent;
 body {
 font: 14px/1.4 'l', Arial, sans-serif;
 z-index:0;
-overflow-x: hidden;
+overflow: hidden;
 background:black;
 color:black;
 --cursor-stroke: rgba(255,255,255,0.5);
@@ -306,7 +306,6 @@ display: none;
 .content_area {
 width: 100vw;
 height: 100vh;
-background: blue;
 }
 
 .fader {
@@ -419,6 +418,25 @@ border-radius: 100%;
 background: url(img/eg_bg.jpg) no-repeat center center;
 animation: rotating 20s linear infinite;
 background-size: 300%;
+}
+
+
+.home_navigation {
+position: fixed;
+top:100px;
+color:white;
+z-index: 9999999;
+}
+
+.home_navigation button {
+cursor: pointer;
+color:white;
+font-size: 20px;
+}
+
+
+.dg.ac {
+z-index: 9999999999999;
 }
 
 
