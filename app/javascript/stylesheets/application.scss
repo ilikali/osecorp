@@ -147,6 +147,19 @@ top:0px;
 left:0px;
 }
 
+.canvas_holder:after {
+width: 100%;
+height: 100%;
+background: #8E9AF4;
+position: absolute;
+top: 0px;
+left: 0px;
+content: '';
+display: block;
+mix-blend-mode: hard-light;
+opacity: 0.1;
+}
+
 header {
 position: absolute;
 top:0px;
@@ -436,6 +449,7 @@ font-size: 20px;
 
 .dg.ac {
 z-index: 9999999999999;
+opacity: 0.7;
 }
 
 
@@ -463,6 +477,7 @@ width: 100%;
 height: 100%;
 top:0px;
 left:0px;
+display: none;
 }
 
 .scroll_content {
@@ -470,6 +485,27 @@ max-width: 1200px;
 margin: 0 auto;
 height: 100%;
 display: flex;
+height: 100%;
+align-items: center;
+}
+
+.scroll_desc {
+width: 45%;
+}
+
+
+.scroll_desc h3{
+font-family: 'r';
+color:white;
+font-size: 65px;
+line-height: 70px;
+margin: 0 0 20px 0;
+display: block;
+}
+
+.scroll_desc p {
+color:rgba(255,255,255,0.6);
+font-size: 18px;
 }
 
 @media screen and (max-width: 1000px) {

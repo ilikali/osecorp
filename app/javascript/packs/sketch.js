@@ -1,4 +1,4 @@
-import { gsap, Power2 } from 'gsap'
+import { gsap, Power2, Power0 } from 'gsap'
 import * as THREE from 'three'
 import * as dat from 'dat.gui'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -20,7 +20,6 @@ export default class Sketch{
     constructor(options){
 
         this.gui = new dat.GUI({
-          width: 900,
           closed: true
         })
         this.debugObject = {}
@@ -60,7 +59,7 @@ export default class Sketch{
           this.loadingManager = new THREE.LoadingManager()
           document.querySelector('.preloader_things').style.display = 'none';
           document.querySelector('.total_wrap').classList.add("show");
-          // this.gui.closed = false
+          this.gui.closed = false
         }
         this.dracoLoader = new DRACOLoader(this.loadingManager)
         this.dracoLoader.setDecoderPath('/draco/')
@@ -208,62 +207,74 @@ export default class Sketch{
       if (document.body.classList.contains('action_home')) {
 
 
-
-        // function myHandler(event, delta) {
-        //     if (event.originalEvent.wheelDelta > 0) {
-        //         $("body.action_home").unbind('mousewheel', myHandler);
-        //         go_to_slide("prev")
-        //     } else {
-        //         $("body.action_home").unbind('mousewheel', myHandler)
-        //         go_to_slide("next")
-        //     }
-        // }
-        //
-        // function go_to_slide(direction) {
-        //     console.log(direction)
-        //     if (direction == "prev") {
-        //
-        //     } else {
-        //
-        //     }
-        //
-        //     setTimeout(function () {
-        //         $("body.action_home").bind("mousewheel", myHandler);
-        //         $("body").addClass("for_scroll");
-        //     }, 2050);
-        // }
-        //
-        // $("body.action_home").bind("mousewheel", myHandler);
-
-
-        // scroll start
-        // this.cameraControls.setLookAt( 1, 1.5, 2, -5, 0, -2, true )
-
-        // scroll first
-        // this.cameraControls.setLookAt( -0.017, 1.768, -0.017, -10, 1.301, -3.418, true )
-
-        let men, light_1, light_2;
+        let men, light_1, light_2, woman, globe;
 
         this.gltfLoader.load(
-            '/models/composition.gltf',
+            '/models/composition_2.gltf',
             (gltf) =>
             {
                 gltf.scene.scale.set(1, 1, 1);
                 men = gltf.scene.children[3];
-                // men.material = new THREE.MeshStandardMaterial({
-                //     color: 0x000000,
-                //     metalness: 20,
-                //     roughness: 20
-                // });
+                woman = gltf.scene.children[6];
+                globe = gltf.scene.children[7];
+                woman.scale.set(0, 0, 0)
+                globe.position.set(-0.61, 3.244, 1)
+                gsap.to(globe.rotation, 10, {z:6.28319, ease: "linear", repeat:-1});
 
                 light_1 = gltf.scene.children[4]
                 light_2 = gltf.scene.children[5]
                 light_2.material = new THREE.MeshBasicMaterial( { color: 0x006FFF } );
                 light_2.layers.enable( this.BLOOM_SCENE );
+
                 this.scene.add(gltf.scene)
                 this.updateAllMaterials()
+                let gltfObject = {
+                  menScale: 1
+                }
+                this.menFolder = this.gui.addFolder('Men');
+                this.menFolder.add(men.position, 'x').min(-5).max(5).step(0.0001).name('posionX')
+                this.menFolder.add(men.position, 'y').min(-5).max(5).step(0.0001).name('posionY')
+                this.menFolder.add(men.position, 'z').min(-5).max(5).step(0.0001).name('posionZ')
+                this.menFolder.add(men.rotation, 'x').min(-2).max(2).step(0.0001).name('rotationX')
+                this.menFolder.add(men.rotation, 'y').min(-2).max(2).step(0.0001).name('rotationY')
+                this.menFolder.add(men.rotation, 'z').min(-2).max(2).step(0.0001).name('rotationZ')
+                this.menFolder.add(gltfObject, 'menScale').min(-1).max(1).step(0.0001).name('sale').onChange(function(){
+                  men.scale.set(gltfObject.menScale, gltfObject.menScale, gltfObject.menScale)
+                })
+
+                this.womanFolder = this.gui.addFolder('Woman');
+                this.womanFolder.add(woman.position, 'x').min(-20).max(20).step(0.0001).name('menPosionX')
+                this.womanFolder.add(woman.position, 'y').min(-20).max(20).step(0.0001).name('menPosionY')
+                this.womanFolder.add(woman.position, 'z').min(-20).max(20).step(0.0001).name('menPosionZ')
+                this.womanFolder.add(woman.rotation, 'x').min(-6).max(6).step(0.0001).name('menRotationX')
+                this.womanFolder.add(woman.rotation, 'y').min(-6).max(6).step(0.0001).name('menRotationY')
+                this.womanFolder.add(woman.rotation, 'z').min(-6).max(6).step(0.0001).name('menRotationZ')
+
+                this.globeFolder = this.gui.addFolder('Globe');
+                this.globeFolder.add(globe.position, 'x').min(-20).max(20).step(0.0001).name('globePosionX')
+                this.globeFolder.add(globe.position, 'y').min(-20).max(20).step(0.0001).name('globePosionY')
+                this.globeFolder.add(globe.position, 'z').min(-20).max(20).step(0.0001).name('globePosionZ')
+                this.globeFolder.add(globe.rotation, 'x').min(-6).max(6).step(0.0001).name('globeRotationX')
+                this.globeFolder.add(globe.rotation, 'y').min(-6).max(6).step(0.0001).name('globeRotationY')
+                this.globeFolder.add(globe.rotation, 'z').min(-6).max(6).step(0.0001).name('globeRotationZ')
+
+                this.globeFolder.open()
             }
         )
+
+        this.globeSphereGeometry = new THREE.SphereGeometry( 0.101, 64, 32 );
+        this.globeSphereMaterial = new THREE.MeshBasicMaterial({
+          transparent: true,
+      		color: 0xffffff,
+      		envMap: this.environmentMap,
+      		refractionRatio: 1,
+      		reflectivity: 1,
+          opacity: 0.2
+    		});
+
+	      this.refractSphere = new THREE.Mesh( this.globeSphereGeometry, this.globeSphereMaterial );
+        this.refractSphere.position.set(-0.61, 3.244, 1)
+        this.scene.add(this.refractSphere);
 
         let camera = this.camera
 
@@ -302,30 +313,118 @@ export default class Sketch{
         });
 
         document.querySelector('.scroll_2').addEventListener('click', (e)=>{
+
           gsap.to( camera.position, {
           	duration: 4,
-          	x: 0.22,
+          	x: 0,
           	y: 1.8,
-          	z: 0.05,
+          	z: 0,
             ease: "power4.inOut"
           });
+
           gsap.to( camera.rotation, {
           	duration: 4,
-          	x: THREE.Math.degToRad(-10),
-          	y: THREE.Math.degToRad(80),
+          	x: THREE.Math.degToRad(0),
+          	y: THREE.Math.degToRad(53),
           	z: THREE.Math.degToRad(0),
             ease: "power4.inOut"
           });
+
+          gsap.to( men.position, {
+            duration: 4,
+            x: -0.2,
+            y: 0.23,
+            z: -0.31,
+            ease: "power4.inOut"
+          });
+
+          gsap.to( men.rotation, {
+          	duration: 4,
+            x: 1.6,
+            y: 0,
+          	z: 0.7,
+            ease: "power4.inOut"
+          });
+
+          setTimeout(function(){
+            gsap.to( woman.scale, {
+              duration: 4,
+              x: 0.8,
+              y: 0.8,
+              z: 0.8,
+              ease: "power4.inOut"
+            });
+
+            gsap.to( woman.position, {
+              duration: 4,
+              y: 0.73,
+              ease: "power4.inOut"
+            });
+          },2000)
+        });
+
+
+        document.querySelector('.scroll_3').addEventListener('click', (e)=>{
+          gsap.to( camera.position, {
+          	duration: 4,
+          	x: -0.125,
+          	y: 1.9,
+          	z: 1.2,
+            ease: "power4.inOut"
+          });
+
+          gsap.to( camera.rotation, {
+          	duration: 4,
+          	x: THREE.Math.degToRad(0),
+          	y: THREE.Math.degToRad(74),
+          	z: THREE.Math.degToRad(0),
+            ease: "power4.inOut"
+          });
+
+          gsap.to( woman.position, {
+            duration: 4,
+            x: -0.69,
+            y: 0.68,
+            z: 0.57,
+            ease: "power4.inOut"
+          });
+
+          gsap.to( woman.rotation, {
+          	duration: 4,
+            x: 1.6,
+            y: -0.03,
+          	z: -0.6,
+            ease: "power4.inOut"
+          });
+
+
+          gsap.to( globe.position, {
+            duration: 4,
+            x: -0.61,
+            y: 1.96,
+            z: 1,
+            ease: "power4.inOut"
+          });
+
+          gsap.to( this.refractSphere.position, {
+            duration: 4,
+            x: -0.61,
+            y: 1.96,
+            z: 1,
+            ease: "power4.inOut"
+          });
+
+
         });
 
         this.camera.rotation.x = THREE.Math.degToRad(-90)
 
         let that = this
-        this.debugObject.positionX = 2.2
-        this.debugObject.positionY = 0.9
-        this.debugObject.positionZ = 2.6
+        this.debugObject.positionX = 0
+        this.debugObject.positionY = 1.76
+        this.debugObject.positionZ = 0
         this.debugObject.targetX = 0
-        this.debugObject.targetY = 60
+        this.debugObject.targetY = 53
         this.debugObject.targetZ = 0
         this.gui.add(this.debugObject, 'positionX').min(-20).max(20).step(0.0001).onChange(function(){
           that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
@@ -366,26 +465,17 @@ export default class Sketch{
 
 
 
+
+
         this.directionalLight = new THREE.DirectionalLight('#ffffff', 3)
         this.directionalLight.castShadow = true
-        this.directionalLight.intensity = 0.3
+        this.directionalLight.intensity = 1
         this.directionalLight.shadow.camera.far = 15
         this.directionalLight.shadow.mapSize.set(1024, 1024)
         this.directionalLight.shadow.normalBias = 0.05
         this.directionalLight.position.set(0.25, 3, - 2.25)
         this.scene.add(this.directionalLight)
 
-
-        // const geometry = new THREE.CircleGeometry( 7, 60 );
-        // const groundMirror = new Reflector( geometry, {
-        // 	clipBias: 0.005,
-        // 	textureWidth: window.innerWidth * window.devicePixelRatio,
-        // 	textureHeight: window.innerHeight * window.devicePixelRatio,
-        // 	color: 0x777777
-        // });
-        // groundMirror.position.y = 0.01;
-        // groundMirror.rotateX( - Math.PI / 2 );
-        // this.scene.add( groundMirror );
 
       }
 
@@ -474,55 +564,6 @@ export default class Sketch{
       this.composer = new EffectComposer( this.renderer );
       this.composer.addPass( this.renderScene );
       this.composer.addPass( this.finalPass );
-
-      // this.composer = new EffectComposer(this.renderer);
-      // this.renderPass = new RenderPass(this.scene, this.camera);
-      // this.composer.addPass(this.renderPass);
-      //
-
-      //
-      // this.bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-      // this.bloomPass.threshold = params.bloomThreshold;
-      // this.bloomPass.strength = params.bloomStrength;
-      // this.bloomPass.radius = params.bloomRadius;
-      //
-      // this.composer.renderToScreen = false;
-      // this.composer.addPass( this.renderPass );
-      // this.composer.addPass( this.bloomPass );
-      //
-      // this.finalPass = new ShaderPass(
-      // 	new THREE.ShaderMaterial( {
-      // 		uniforms: {
-      // 			baseTexture: { value: null },
-      // 			bloomTexture: { value: this.composer.renderTarget2.texture }
-      // 		},
-      // 		vertexShader: `
-      //     varying vec2 vUv;
-      //
-      // 			void main() {
-      //
-      // 				vUv = uv;
-      //
-      // 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-      //
-      // 			}
-      //     `,
-      // 		fragmentShader: `
-      //     uniform sampler2D baseTexture;
-      // 			uniform sampler2D bloomTexture;
-      //
-      // 			varying vec2 vUv;
-      //
-      // 			void main() {
-      //
-      // 				gl_FragColor = ( texture2D( baseTexture, vUv ) + vec4( 1.0 ) * texture2D( bloomTexture, vUv ) );
-      //
-      // 			}`,
-      // 		defines: {}
-      // 	} ), "baseTexture"
-      // );
-      // this.finalPass.needsSwap = true;
-      // this.composer.addPass( this.finalPass );
     }
 
     setupResize(){
