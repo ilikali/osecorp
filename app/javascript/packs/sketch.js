@@ -91,7 +91,7 @@ export default class Sketch{
         this.height = this.container.offsetHeight;
 
         this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.1, 100)
-        this.camera.position.set(0, 20, 0)
+        this.camera.position.set(0, 25, 0)
         this.camera.lookAt(0, 0, 0)
 
         this.renderer = new THREE.WebGLRenderer({
@@ -121,7 +121,14 @@ export default class Sketch{
           sound.setBuffer( buffer );
           sound.setLoop( true );
           sound.setVolume( 0.2 );
-          // sound.play();
+          sound.play();
+        });
+
+        let that = this
+
+        document.querySelector('.audio_swither').addEventListener('click', (e)=>{
+          gsap.to( that.audioListener.gain.gain, {value:0, duration: 2});
+
         });
 
 
@@ -199,6 +206,7 @@ export default class Sketch{
 
     initScene(){
       $('.fader').fadeOut(1000);
+      let that = this
 
       while(this.scene.children.length > 0){
         this.scene.remove(this.scene.children[0]);
@@ -207,17 +215,307 @@ export default class Sketch{
       if (document.body.classList.contains('action_home')) {
 
 
-        let men, light_1, light_2, woman, globe;
+        let men, light_1, light_2, woman, globe, floor, totalScene;
+        let camera = this.camera;
+
+        let titles = document.querySelectorAll('.scroll_desc h3');
+        titles.forEach(title => {
+          let splitted = title.textContent.split("");
+          title.textContent = "";
+          splitted.forEach((element) => {
+              title.innerHTML += "<span>" + element + "</span>";
+          });
+        })
+
+
+        this.animationParams = {
+          globalDuration: 4,
+          globalEase: "power4.inOut",
+        }
+
+        this.globalPositions = {
+          firstScroll:{
+            camera:{
+              position:{
+                x: 2.2,
+                y: 0.9,
+                z: 2.6,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              rotation:{
+                x: THREE.Math.degToRad(0),
+                y: THREE.Math.degToRad(60),
+                z: THREE.Math.degToRad(0),
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              }
+            },
+            men:{
+              position:{
+                x: -0.19,
+                y: 0.23,
+                z: -0.23,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              rotation:{
+                x: 1.57,
+                y: 0,
+                z: 0.42,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              }
+            },
+            woman:{
+              position:{
+                x: -0.54,
+                y: 0.68,
+                z: 0.61,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              rotation:{
+                x: 1.06,
+                y: -0.12,
+                z: -2.56,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              scale:{
+                x: 0,
+                y: 0,
+                z: 0,
+                duration: 2,
+                ease: this.animationParams.globalEase
+              }
+            },
+            globe:{
+              position:{
+                x: -0.61,
+                y: 3.244,
+                z: 1,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+            },
+            refractGlobe: {
+              position:{
+                x: -0.61,
+                y: 3.244,
+                z: 1,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+            }
+          },
+          secondScroll:{
+            camera:{
+              position:{
+                x: 0,
+                y: 1.8,
+                z: 0,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              rotation:{
+                x: THREE.Math.degToRad(0),
+                y: THREE.Math.degToRad(53),
+                z: THREE.Math.degToRad(0),
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              }
+            },
+            men:{
+              position:{
+                x: -0.18,
+                y: 0.23,
+                z: -0.31,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              rotation:{
+                x: 1.6,
+                y: 0,
+                z: 0.7,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              }
+            },
+            woman:{
+              position:{
+                x: -0.54,
+                y: 0.73,
+                z: 0.61,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              rotation:{
+                x: 1.06,
+                y: -0.12,
+                z: -2.56,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              scale:{
+                x: 0.8,
+                y: 0.8,
+                z: 0.8,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              }
+            },
+            globe:{
+              position:{
+                x: -0.61,
+                y: 3.244,
+                z: 1,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              scale:{
+                x: 0.2,
+                y: 0.2,
+                z: 0.2,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              }
+            },
+            refractGlobe: {
+              position:{
+                x: -0.61,
+                y: 3.244,
+                z: 1,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              scale:{
+                x: 1,
+                y: 1,
+                z: 1,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              }
+            }
+          },
+          thirdScroll:{
+            camera:{
+              position:{
+                x: -0.125,
+                y: 1.9,
+                z: 1.2,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              rotation:{
+                x: THREE.Math.degToRad(0),
+                y: THREE.Math.degToRad(74),
+                z: THREE.Math.degToRad(0),
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              }
+            },
+            men:{
+              position:{
+                x: -0.18,
+                y: 0.23,
+                z: -0.31,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              rotation:{
+                x: 1.6,
+                y: 0,
+                z: 0.7,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              }
+            },
+            woman:{
+              position:{
+                x: -0.69,
+                y: 0.68,
+                z: 0.57,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              rotation:{
+                x: 1.6,
+                y: -0.03,
+              	z: -0.6,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              scale:{
+                x: 0.8,
+                y: 0.8,
+                z: 0.8,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              }
+            },
+            globe:{
+              position:{
+                x: -0.61,
+                y: 1.96,
+                z: 1,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              scale:{
+                x: 0.2,
+                y: 0.2,
+                z: 0.2,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              }
+            },
+            refractGlobe: {
+              position:{
+                x: -0.61,
+                y: 1.96,
+                z: 1,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              },
+              scale:{
+                x: 1,
+                y: 1,
+                z: 1,
+                duration: this.animationParams.globalDuration,
+                ease: this.animationParams.globalEase
+              }
+            }
+          }
+        }
 
         this.gltfLoader.load(
             '/models/composition_2.gltf',
             (gltf) =>
             {
+                totalScene = gltf.scene
+
+                const cursor = {
+                    x: 0,
+                    y: 0
+                }
+
+                window.addEventListener('mousemove', (event) =>{
+                    cursor.x = event.clientX / that.width - 0.5
+                    cursor.y = event.clientY / that.height - 0.5
+
+                    totalScene.position.x = cursor.x/80
+                    totalScene.position.y = cursor.y/80
+                })
+
                 gltf.scene.scale.set(1, 1, 1);
+
+
                 men = gltf.scene.children[3];
                 woman = gltf.scene.children[6];
-                globe = gltf.scene.children[7];
                 woman.scale.set(0, 0, 0)
+
+                globe = gltf.scene.children[7];
                 globe.position.set(-0.61, 3.244, 1)
                 gsap.to(globe.rotation, 10, {z:6.28319, ease: "linear", repeat:-1});
 
@@ -226,11 +524,26 @@ export default class Sketch{
                 light_2.material = new THREE.MeshBasicMaterial( { color: 0x006FFF } );
                 light_2.layers.enable( this.BLOOM_SCENE );
 
+                light_1.position.y = 10
+                light_1.material = new THREE.MeshBasicMaterial( { color: 0x006FFF } );
+                light_1.layers.enable( this.BLOOM_SCENE );
+
+                floor = gltf.scene.children[1]
+                floor.position.y = 8
                 this.scene.add(gltf.scene)
+
+
                 this.updateAllMaterials()
                 let gltfObject = {
                   menScale: 1
                 }
+
+                setTimeout(function(){
+                  gsap.to( floor.position, {y:0, duration: 4, ease: "power4.inOut" });
+                  gsap.to( light_1.position, {y:-4, duration: 4, ease: "power4.inOut" });
+                  $(".firstScroll").trigger("click")
+                },1000)
+
                 this.menFolder = this.gui.addFolder('Men');
                 this.menFolder.add(men.position, 'x').min(-5).max(5).step(0.0001).name('posionX')
                 this.menFolder.add(men.position, 'y').min(-5).max(5).step(0.0001).name('posionY')
@@ -241,7 +554,6 @@ export default class Sketch{
                 this.menFolder.add(gltfObject, 'menScale').min(-1).max(1).step(0.0001).name('sale').onChange(function(){
                   men.scale.set(gltfObject.menScale, gltfObject.menScale, gltfObject.menScale)
                 })
-
                 this.womanFolder = this.gui.addFolder('Woman');
                 this.womanFolder.add(woman.position, 'x').min(-20).max(20).step(0.0001).name('menPosionX')
                 this.womanFolder.add(woman.position, 'y').min(-20).max(20).step(0.0001).name('menPosionY')
@@ -257,8 +569,6 @@ export default class Sketch{
                 this.globeFolder.add(globe.rotation, 'x').min(-6).max(6).step(0.0001).name('globeRotationX')
                 this.globeFolder.add(globe.rotation, 'y').min(-6).max(6).step(0.0001).name('globeRotationY')
                 this.globeFolder.add(globe.rotation, 'z').min(-6).max(6).step(0.0001).name('globeRotationZ')
-
-                this.globeFolder.open()
             }
         )
 
@@ -271,155 +581,103 @@ export default class Sketch{
       		reflectivity: 1,
           opacity: 0.2
     		});
+	      this.refractGlobe = new THREE.Mesh( this.globeSphereGeometry, this.globeSphereMaterial );
+        this.refractGlobe.position.set(-0.61, 3.244, 1)
+        this.refractGlobe.scale.set(0, 0, 0)
+        this.scene.add(this.refractGlobe);
 
-	      this.refractSphere = new THREE.Mesh( this.globeSphereGeometry, this.globeSphereMaterial );
-        this.refractSphere.position.set(-0.61, 3.244, 1)
-        this.scene.add(this.refractSphere);
 
-        let camera = this.camera
+        let showScrollDescritpion = function(){
+          $(".scroll_desc span").removeAttr("style");
+          $(".home_scroll_item.active").addClass("animate")
+          let active = $('.home_scroll_item.animate');
+          let titleLetters = active.find('h3 span');
+          let lettersArray = titleLetters.toArray();
+          lettersArray.sort(function() {return 0.5-Math.random()});
+          gsap.to( lettersArray, {
+            duration: 1,
+            top: 0,
+            opacity: 1,
+            stagger: 0.02
+          }).play();
+        }
 
-        setTimeout(function(){
-          gsap.to( camera.position, {
-          	duration: 0.1,
-          	x: 2.2,
-          	y: 0.9,
-          	z: 2.6,
-            ease: "power4.inOut"
-          });
-          gsap.to( camera.rotation, {
-          	duration: 0.1,
-          	x: THREE.Math.degToRad(0),
-          	y: THREE.Math.degToRad(60),
-          	z: THREE.Math.degToRad(0),
-            ease: "power4.inOut"
-          });
-        },1)
-
-        document.querySelector('.scroll_1').addEventListener('click', (e)=>{
-          gsap.to( camera.position, {
-          	duration: 4,
-          	x: 2.2,
-          	y: 0.9,
-          	z: 2.6,
-            ease: "power4.inOut"
-          });
-          gsap.to( camera.rotation, {
-          	duration: 4,
-          	x: THREE.Math.degToRad(0),
-          	y: THREE.Math.degToRad(60),
-          	z: THREE.Math.degToRad(0),
-            ease: "power4.inOut"
-          });
-        });
-
-        document.querySelector('.scroll_2').addEventListener('click', (e)=>{
-
-          gsap.to( camera.position, {
-          	duration: 4,
-          	x: 0,
-          	y: 1.8,
-          	z: 0,
-            ease: "power4.inOut"
-          });
-
-          gsap.to( camera.rotation, {
-          	duration: 4,
-          	x: THREE.Math.degToRad(0),
-          	y: THREE.Math.degToRad(53),
-          	z: THREE.Math.degToRad(0),
-            ease: "power4.inOut"
-          });
-
-          gsap.to( men.position, {
-            duration: 4,
-            x: -0.2,
-            y: 0.23,
-            z: -0.31,
-            ease: "power4.inOut"
-          });
-
-          gsap.to( men.rotation, {
-          	duration: 4,
-            x: 1.6,
-            y: 0,
-          	z: 0.7,
-            ease: "power4.inOut"
-          });
-
+        let detectActiveScroll = function(e){
+          let scrollName = e.srcElement.getAttribute('data-scroll')
+          $(".scroll_bttns").removeClass("active");
+          $(this).addClass("active");
+          $(".home_scroll_item").removeClass("active");
           setTimeout(function(){
-            gsap.to( woman.scale, {
-              duration: 4,
-              x: 0.8,
-              y: 0.8,
-              z: 0.8,
-              ease: "power4.inOut"
-            });
+            $(".home_scroll_item[data-scroll='"+scrollName+"']").addClass("active");
+            showScrollDescritpion();
+          },4000)
+        }
 
-            gsap.to( woman.position, {
-              duration: 4,
-              y: 0.73,
-              ease: "power4.inOut"
-            });
-          },2000)
+        document.querySelector('.firstScroll').addEventListener('click', (e)=>{
+          // camera
+          gsap.to( camera.position, that.globalPositions.firstScroll.camera.position);
+          gsap.to( camera.rotation, that.globalPositions.firstScroll.camera.rotation);
+          // men
+          gsap.to( men.position, that.globalPositions.firstScroll.men.position);
+          gsap.to( men.rotation, that.globalPositions.firstScroll.men.rotation);
+          // woman
+          gsap.to( woman.position, that.globalPositions.firstScroll.woman.position);
+          gsap.to( woman.rotation, that.globalPositions.firstScroll.woman.rotation);
+          gsap.to( woman.scale, that.globalPositions.firstScroll.woman.scale);
+          // globe
+          gsap.to( globe.position, that.globalPositions.firstScroll.globe.position);
+          // refractGlobe
+          gsap.to( this.refractGlobe.position, that.globalPositions.firstScroll.refractGlobe.position);
+
+          detectActiveScroll(e)
         });
 
+        document.querySelector('.secondScroll').addEventListener('click', (e)=>{
+          // camera
+          gsap.to( camera.position, that.globalPositions.secondScroll.camera.position);
+          gsap.to( camera.rotation, that.globalPositions.secondScroll.camera.rotation);
+          // men
+          gsap.to( men.position, that.globalPositions.secondScroll.men.position);
+          gsap.to( men.rotation, that.globalPositions.secondScroll.men.rotation);
+          // globe
+          gsap.to( globe.position, that.globalPositions.secondScroll.globe.position);
+          gsap.to( globe.scale, that.globalPositions.secondScroll.globe.scale);
+          // refractGlobe
+          gsap.to( this.refractGlobe.position, that.globalPositions.secondScroll.refractGlobe.position);
+          gsap.to( this.refractGlobe.scale, that.globalPositions.secondScroll.refractGlobe.scale);
+          // woman
+          setTimeout(function(){
+            gsap.to( woman.position, that.globalPositions.secondScroll.woman.position);
+            gsap.to( woman.rotation, that.globalPositions.secondScroll.woman.rotation);
+            gsap.to( woman.scale, that.globalPositions.secondScroll.woman.scale);
+          },1000)
 
-        document.querySelector('.scroll_3').addEventListener('click', (e)=>{
-          gsap.to( camera.position, {
-          	duration: 4,
-          	x: -0.125,
-          	y: 1.9,
-          	z: 1.2,
-            ease: "power4.inOut"
-          });
+          detectActiveScroll(e)
+        });
 
-          gsap.to( camera.rotation, {
-          	duration: 4,
-          	x: THREE.Math.degToRad(0),
-          	y: THREE.Math.degToRad(74),
-          	z: THREE.Math.degToRad(0),
-            ease: "power4.inOut"
-          });
+        document.querySelector('.thirdScroll').addEventListener('click', (e)=>{
+          // camera
+          gsap.to( camera.position, that.globalPositions.thirdScroll.camera.position);
+          gsap.to( camera.rotation, that.globalPositions.thirdScroll.camera.rotation);
+          // men
+          gsap.to( men.position, that.globalPositions.thirdScroll.men.position);
+          gsap.to( men.rotation, that.globalPositions.thirdScroll.men.rotation);
+          // woman
+          gsap.to( woman.position, that.globalPositions.thirdScroll.woman.position);
+          gsap.to( woman.rotation, that.globalPositions.thirdScroll.woman.rotation);
+          gsap.to( woman.scale, that.globalPositions.thirdScroll.woman.scale);
+          // globe
+          gsap.to( globe.position, that.globalPositions.thirdScroll.globe.position);
+          gsap.to( globe.scale, that.globalPositions.thirdScroll.globe.scale);
+          // refractGlobe
+          gsap.to( this.refractGlobe.position, that.globalPositions.thirdScroll.refractGlobe.position);
+          gsap.to( this.refractGlobe.scale, that.globalPositions.thirdScroll.refractGlobe.scale);
 
-          gsap.to( woman.position, {
-            duration: 4,
-            x: -0.69,
-            y: 0.68,
-            z: 0.57,
-            ease: "power4.inOut"
-          });
-
-          gsap.to( woman.rotation, {
-          	duration: 4,
-            x: 1.6,
-            y: -0.03,
-          	z: -0.6,
-            ease: "power4.inOut"
-          });
-
-
-          gsap.to( globe.position, {
-            duration: 4,
-            x: -0.61,
-            y: 1.96,
-            z: 1,
-            ease: "power4.inOut"
-          });
-
-          gsap.to( this.refractSphere.position, {
-            duration: 4,
-            x: -0.61,
-            y: 1.96,
-            z: 1,
-            ease: "power4.inOut"
-          });
-
-
+          detectActiveScroll(e)
         });
 
         this.camera.rotation.x = THREE.Math.degToRad(-90)
 
-        let that = this
         this.debugObject.positionX = 0
         this.debugObject.positionY = 1.76
         this.debugObject.positionZ = 0
@@ -467,6 +725,8 @@ export default class Sketch{
 
 
 
+
+
         this.directionalLight = new THREE.DirectionalLight('#ffffff', 3)
         this.directionalLight.castShadow = true
         this.directionalLight.intensity = 1
@@ -475,6 +735,32 @@ export default class Sketch{
         this.directionalLight.shadow.normalBias = 0.05
         this.directionalLight.position.set(0.25, 3, - 2.25)
         this.scene.add(this.directionalLight)
+
+        // function myHandler(event, delta) {
+        //     if (event.originalEvent.wheelDelta > 0) {
+        //         $("body.action_home").unbind('mousewheel', myHandler);
+        //         go_to_slide("prev")
+        //     } else {
+        //         $("body.action_home").unbind('mousewheel', myHandler)
+        //         go_to_slide("next")
+        //     }
+        // }
+        //
+        // function go_to_slide(direction) {
+        //     console.log(direction)
+        //     if (direction == "prev") {
+        //
+        //     } else {
+        //
+        //     }
+        //
+        //     setTimeout(function () {
+        //         $("body.action_home").bind("mousewheel", myHandler);
+        //         $("body").addClass("for_scroll");
+        //     }, 2050);
+        // }
+        //
+        // $("body.action_home").bind("mousewheel", myHandler);
 
 
       }
