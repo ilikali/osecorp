@@ -8,26 +8,27 @@ import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import CameraControls from 'camera-controls';
 import Cursor from './cursor';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
-const TWEEN = require('@tweenjs/tween.js')
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import Scrollbar from 'smooth-scrollbar';
+const TWEEN = require('@tweenjs/tween.js')
+
+
 
 
 
 export default class Sketch{
     constructor(options){
 
+        let that = this
         this.gui = new dat.GUI({
           closed: true
         })
         this.debugObject = {}
 
-        CameraControls.install({ THREE: THREE });
-
         this.audioListener = new THREE.AudioListener();
-        const sound = new THREE.Audio(this.audioListener);
+        this.sound = new THREE.Audio(this.audioListener);
 
         let loaded_manager = 1
 
@@ -52,7 +53,7 @@ export default class Sketch{
           document.querySelector('.enter').addEventListener('click', (e)=>{
             $(".enter_wrap").fadeOut(function(){
               $(".total_wrap").addClass("show");
-              sound.play();
+              that.sound.play();
             })
           });
         }else {
@@ -91,8 +92,6 @@ export default class Sketch{
         this.height = this.container.offsetHeight;
 
         this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.1, 100)
-        this.camera.position.set(0, 25, 0)
-        this.camera.lookAt(0, 0, 0)
 
         this.renderer = new THREE.WebGLRenderer({
             antialias: true,
@@ -107,32 +106,24 @@ export default class Sketch{
         this.renderer.setSize(this.width , this.height)
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-        this.cameraControls = new CameraControls( this.camera, this.renderer.domElement);
-        this.cameraControls.enabled = false;
+
 
         this.container.appendChild( this.renderer.domElement );
 
         this.stats = new Stats()
         this.stats.showPanel(0)
         document.body.appendChild(this.stats.dom)
-
         this.camera.add( this.audioListener );
         this.audioLoader.load( '/sounds/background.ogg', function( buffer ) {
-          sound.setBuffer( buffer );
-          sound.setLoop( true );
-          sound.setVolume( 0.2 );
-          sound.play();
+          that.sound.setBuffer( buffer );
+          that.sound.setLoop( true );
+          that.sound.setVolume( 0.2 );
+          // that.sound.play();
         });
-
-        let that = this
 
         document.querySelector('.audio_swither').addEventListener('click', (e)=>{
           gsap.to( that.audioListener.gain.gain, {value:0, duration: 2});
-
         });
-
-
-
 
 
         this.popped = ('state' in window.history && window.history.state !== null), this.initialURL = location.href;
@@ -213,7 +204,8 @@ export default class Sketch{
       }
 
       if (document.body.classList.contains('action_home')) {
-
+        this.camera.position.set(0, 25, 0)
+        this.camera.lookAt(0, 0, 0)
 
         let men, light_1, light_2, woman, globe, floor, totalScene;
         let camera = this.camera;
@@ -764,7 +756,207 @@ export default class Sketch{
 
 
       }
+      else if (document.body.classList.contains('action_about')) {
+        this.camera.position.set(0, 0, 2)
+        this.camera.lookAt(0, 0, 0)
+        const fragmentShader = `uniform vec3 iResolution;
+              uniform float iTime;
+              uniform float iAngle;
+              uniform sampler2D iChannel0;
+              uniform sampler2D iChannel1;
 
+              #if __VERSION__ < 130
+              #define TEXTURE2D texture2D
+              #else
+              #define TEXTURE2D texture
+              #endif
+
+
+              float snoise(vec3 uv, float res)	// by trisomie21
+              {
+              	const vec3 s = vec3(1e0, 1e2, 1e4);
+
+              	uv *= res;
+
+              	vec3 uv0 = floor(mod(uv, res))*s;
+              	vec3 uv1 = floor(mod(uv+vec3(1.), res))*s;
+
+              	vec3 f = fract(uv); f = f*f*(3.0-2.0*f);
+
+              	vec4 v = vec4(uv0.x+uv0.y+uv0.z, uv1.x+uv0.y+uv0.z,
+              		      	  uv0.x+uv1.y+uv0.z, uv1.x+uv1.y+uv0.z);
+
+              	vec4 r = fract(sin(v*1e-3)*1e5);
+              	float r0 = mix(mix(r.x, r.y, f.x), mix(r.z, r.w, f.x), f.y);
+
+              	r = fract(sin((v + uv1.z - uv0.z)*1e-3)*1e5);
+              	float r1 = mix(mix(r.x, r.y, f.x), mix(r.z, r.w, f.x), f.y);
+
+              	return mix(r0, r1, f.z)*2.-1.;
+              }
+
+              float freqs[4];
+
+              void mainImage( out vec4 fragColor, in vec2 fragCoord )
+              {
+              	freqs[0] = TEXTURE2D( iChannel1, vec2( 0.01, 0.25 ) ).x;
+              	freqs[1] = TEXTURE2D( iChannel1, vec2( 0.07, 0.25 ) ).x;
+              	freqs[2] = TEXTURE2D( iChannel1, vec2( 0.15, 0.25 ) ).x;
+              	freqs[3] = TEXTURE2D( iChannel1, vec2( 0.30, 0.25 ) ).x;
+
+              	float brightness	= freqs[1] * 0.25 + freqs[2] * 0.25;
+              	float radius		= 0.24 + brightness * 0.2;
+              	float invRadius 	= 1.0/radius;
+
+              	vec3 orange			= vec3( 0.8, 0.65, 0.3 );
+              	vec3 orangeRed		= vec3( 0.8, 0.35, 0.1 );
+              	float time		= iTime / 100.0;
+              	float aspect	= 1.5 ;
+              	vec2 uv			= fragCoord.xy / iResolution.xy;
+              	vec2 p 			= -0.5 + uv;
+              	p.x *= aspect;
+
+              	float fade		= pow( length( 2.0 * p ), 0.5 );
+              	float fVal1		= 1.0 - fade;
+              	float fVal2		= 1.0 - fade;
+
+              	float angle		= atan( p.x, p.y )/iAngle;
+              	float dist		= length(p);
+              	vec3 coord		= vec3( angle, dist, time * 0.1 );
+
+              	float newTime1	= abs( snoise( coord + vec3( 0.0, -time * ( 0.35 + brightness * 0.001 ), time * 0.015 ), 15.0 ) );
+              	float newTime2	= abs( snoise( coord + vec3( 0.0, -time * ( 0.15 + brightness * 0.001 ), time * 0.015 ), 45.0 ) );
+              	for( int i=1; i<=7; i++ ){
+              		float power = pow( 2.0, float(i + 1) );
+              		fVal1 += ( 0.5 / power ) * snoise( coord + vec3( 0.0, -time, time * 0.2 ), ( power * ( 10.0 ) * ( newTime1 + 1.0 ) ) );
+              		fVal2 += ( 0.5 / power ) * snoise( coord + vec3( 0.0, -time, time * 0.2 ), ( power * ( 25.0 ) * ( newTime2 + 1.0 ) ) );
+              	}
+
+              	float corona		= pow( fVal1 * max( 1.1 - fade, 0.0 ), 2.0 ) * 50.0;
+              	corona				+= pow( fVal2 * max( 1.1 - fade, 0.0 ), 2.0 ) * 50.0;
+              	corona				*= 1.2 - newTime1;
+              	vec3 sphereNormal 	= vec3( 0.0, 0.0, 1.0 );
+              	vec3 dir 			= vec3( 0.0 );
+              	vec3 center			= vec3( 0.5, 0.5, 1.0 );
+              	vec3 starSphere		= vec3( 0.0 );
+
+              	vec2 sp = -1.0 + 2.0 * uv;
+              	sp.x *= aspect;
+              	sp *= ( 2.0 - brightness );
+                float r = dot(sp,sp);
+              	float f = (1.0-sqrt(abs(1.0-r)))/(r) + brightness * 0.5;
+              	if( dist < radius ){
+              		corona			*= pow( dist * invRadius, 24.0 );
+                	vec2 newUv;
+               		newUv.x = sp.x*f;
+                	newUv.y = sp.y*f;
+              		newUv += vec2( time, 0.0 );
+
+              		vec3 texSample 	= TEXTURE2D( iChannel0, newUv ).rgb;
+              		float uOff		= ( texSample.g * brightness * 4.5 + time / 0.8 );
+              		vec2 starUV		= newUv + vec2( uOff, 0.0 );
+              		starSphere		= TEXTURE2D( iChannel0, starUV ).rgb;
+              	}
+
+              	float starGlow	= min( max( 1.0 - dist * ( 1.0 - brightness ), 0.0 ), 1.0 );
+              	//fragColor.rgb	= vec3( r );
+              	fragColor.rgb	= vec3( f * ( 0.75 + brightness * 0.3 ) * orange ) + starSphere + corona * orange + starGlow * orangeRed;
+              	fragColor.a		= 1.0;
+              }
+
+              varying vec2 vUv;
+
+              void main() {
+                mainImage(gl_FragColor, vUv * iResolution.xy);
+              }
+      `
+
+
+        const geometry = new THREE.PlaneGeometry(4, 2.66, 32, 32)
+
+        const resolution = new THREE.Vector2(this.container.offsetWidth, this.container.offsetHeight);
+
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load('/textures/texture.jpeg');
+        texture.minFilter = THREE.NearestFilter;
+        texture.magFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+
+
+        const fftSize = 128;
+        this.analyser = new THREE.AudioAnalyser( this.sound, fftSize );
+        const format = THREE.RedFormat;
+        this.uniforms = {
+        iTime: { value: 0 },
+        iResolution:  { value: new THREE.Vector3(1,1,1) },
+        iChannel0: { value: texture },
+        iChannel1: { value: new THREE.DataTexture( this.analyser.data, fftSize / 2, 1, format ) },
+        iAngle: {value: 6.2832}
+        };
+        const material = new THREE.ShaderMaterial({
+          fragmentShader: fragmentShader,
+          vertexShader: `
+            varying vec2 vUv;
+            void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+            }
+          `,
+          uniforms: that.uniforms
+        });
+        const mesh = new THREE.Mesh(geometry, material)
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        this.scene.add(mesh)
+
+        const scroll = Scrollbar.init(document.querySelector('.partners_content'));
+        scroll.addListener((s) => {
+            that.camera.position.y = -s.offset.y / 1000;
+        })
+
+        // document.querySelector('.partners_content').addEventListener('wheel', (e)=>{
+        //   that.camera.position.y = -document.querySelector('.partners_content').scrollTop / 1000;
+        //   // that.camera.position.z = 10 - document.querySelector('.partners_content').scrollY / 500.0;
+        // });
+
+
+        // this.gltfLoader.load(
+        //     '/models/hands.gltf',
+        //     (gltf) =>
+        //     {
+        //
+        //         gltf.scene.scale.set(1, 1, 1);
+        //         gltf.scene.position.set(0, -0.1, 0.6);
+        //         gltf.scene.rotation.x = -0.13;
+        //         gltf.scene.rotation.y = -1.4;
+        //         this.scene.add(gltf.scene)
+        //         this.updateAllMaterials()
+        //
+        //         this.handFolder = this.gui.addFolder('Hand');
+        //         this.handFolder.add(gltf.scene.position, 'x').min(-5).max(5).step(0.0001).name('posionX')
+        //         this.handFolder.add(gltf.scene.position, 'y').min(-5).max(5).step(0.0001).name('posionY')
+        //         this.handFolder.add(gltf.scene.position, 'z').min(-5).max(5).step(0.0001).name('posionZ')
+        //         this.handFolder.add(gltf.scene.rotation, 'x').min(-2).max(2).step(0.0001).name('rotationX')
+        //         this.handFolder.add(gltf.scene.rotation, 'y').min(-2).max(2).step(0.0001).name('rotationY')
+        //         this.handFolder.add(gltf.scene.rotation, 'z').min(-2).max(2).step(0.0001).name('rotationZ')
+        //         this.handFolder.open()
+        //
+        //     }
+        // )
+        //
+        // this.directionalLight = new THREE.DirectionalLight('#ffffff', 3)
+        // this.directionalLight.castShadow = true
+        // this.directionalLight.intensity = 1
+        // this.directionalLight.shadow.camera.far = 15
+        // this.directionalLight.shadow.mapSize.set(1024, 1024)
+        // this.directionalLight.shadow.normalBias = 0.05
+        // this.directionalLight.position.set(0.25, 3, - 2.25)
+        // this.scene.add(this.directionalLight)
+      }
+
+      // Scrollbar.initAll();
     }
 
 
@@ -886,7 +1078,6 @@ export default class Sketch{
     render(){
 
         this.stats.begin()
-
         const elapsedTime = this.clock.getElapsedTime()
         const deltaTime = elapsedTime - this.previousTime
         this.previousTime = elapsedTime
@@ -895,8 +1086,15 @@ export default class Sketch{
     		this.bloomComposer.render();
     		this.restoreMaterial()
         this.composer.render()
-
         window.requestAnimationFrame(this.render.bind(this));
+
+        if (document.body.classList.contains('action_about')) {
+          this.analyser.getFrequencyData();
+          this.uniforms.iChannel1.value.needsUpdate = true;
+          const canvas = this.renderer.domElement;
+          this.uniforms.iResolution.value.set(canvas.width, canvas.height, 1);
+          this.uniforms.iTime.value = elapsedTime;
+        }
 
         this.stats.end()
 
