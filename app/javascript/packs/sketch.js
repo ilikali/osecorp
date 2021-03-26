@@ -10,8 +10,6 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import Cursor from './cursor';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-
-import Scrollbar from 'smooth-scrollbar';
 const TWEEN = require('@tweenjs/tween.js')
 
 
@@ -397,12 +395,10 @@ export default class Sketch{
     updateAllMaterials(){
       this.scene.traverse((child) => {
           if(child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
-              console.log(child)
-              child.material.envMapIntensity = 1
+              child.material.envMapIntensity = 0.7
               child.material.needsUpdate = true
               child.castShadow = true
               child.receiveShadow = true
-              // console.log("chidl_shadow"+child)
           }
       })
     }
@@ -521,6 +517,14 @@ export default class Sketch{
     		this.restoreMaterial()
         this.composer.render()
         window.requestAnimationFrame(this.render.bind(this));
+
+        if (document.body.classList.contains('action_home')) {
+          if ( this.video.readyState === this.video.HAVE_ENOUGH_DATA ) {
+        		if ( this.videoTexture ) {
+              this.videoTexture.needsUpdate = true;
+            }
+        	}
+        }
 
         if (document.body.classList.contains('action_about')) {
           this.analyser.getFrequencyData();
