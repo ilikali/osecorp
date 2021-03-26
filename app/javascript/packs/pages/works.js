@@ -13,7 +13,6 @@ export default class Works{
           '/models/works.gltf',
           (gltf) =>
           {
-              console.log(gltf.scene)
               gltf.scene.scale.set(1, 1, 1);
               parent.scene.add(gltf.scene)
               parent.updateAllMaterials()

@@ -30,7 +30,7 @@ export default class Sketch{
           closed: true
         })
         this.debugObject = {}
-        this.animation_start = false
+        this.animation_start = !options.showLoader
 
         this.audioListener = new THREE.AudioListener();
         this.sound = new THREE.Audio(this.audioListener);
@@ -215,6 +215,8 @@ export default class Sketch{
       },4000)
       let that = this
 
+      $("body.action_home").unbind('mousewheel');
+
       while(this.scene.children.length > 0){
         this.scene.remove(this.scene.children[0]);
       }
@@ -395,10 +397,12 @@ export default class Sketch{
     updateAllMaterials(){
       this.scene.traverse((child) => {
           if(child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
+              console.log(child)
               child.material.envMapIntensity = 1
               child.material.needsUpdate = true
               child.castShadow = true
               child.receiveShadow = true
+              // console.log("chidl_shadow"+child)
           }
       })
     }

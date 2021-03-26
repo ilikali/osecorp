@@ -284,7 +284,7 @@ export default class Home{
       }
 
       parent.gltfLoader.load(
-          '/models/composition_2.gltf',
+          '/models/composition_3.gltf',
           (gltf) =>
           {
               totalScene = gltf.scene
@@ -305,24 +305,24 @@ export default class Home{
               gltf.scene.scale.set(1, 1, 1);
 
 
-              men = gltf.scene.children[3];
-              woman = gltf.scene.children[6];
+              men = gltf.scene.children.find(x => x.name === "men");
+              woman = gltf.scene.children.find(x => x.name === "woman");
               woman.scale.set(0, 0, 0)
 
-              globe = gltf.scene.children[7];
+              globe = gltf.scene.children.find(x => x.name === "globe");
               globe.position.set(-0.61, 3.244, 1)
               gsap.to(globe.rotation, 10, {z:6.28319, ease: "linear", repeat:-1});
 
-              light_1 = gltf.scene.children[4]
-              light_2 = gltf.scene.children[5]
+              // light_1 = gltf.scene.children.find(x => x.name === "light_1");
+              light_2 = gltf.scene.children.find(x => x.name === "light_2");
               light_2.material = new THREE.MeshBasicMaterial( { color: 0x006FFF } );
               light_2.layers.enable( parent.BLOOM_SCENE );
 
-              light_1.position.y = 10
-              light_1.material = new THREE.MeshBasicMaterial( { color: 0x006FFF } );
-              light_1.layers.enable( parent.BLOOM_SCENE );
+              // light_1.position.y = 10
+              // light_1.material = new THREE.MeshBasicMaterial( { color: 0x006FFF } );
+              // light_1.layers.enable( parent.BLOOM_SCENE );
 
-              floor = gltf.scene.children[1]
+              floor = gltf.scene.children.find(x => x.name === "floor");
               floor.position.y = 8
               parent.scene.add(gltf.scene)
 
@@ -332,18 +332,16 @@ export default class Home{
                 menScale: 1
               }
               let interval = setInterval(function(){
-                console.log("Waiting")
                 if(parent.animation_start) {
-                  console.log("Stop waiting")
                   setTimeout(function(){
                     gsap.to( floor.position, {y:0, duration: 4, ease: "power4.inOut" });
-                    gsap.to( light_1.position, {y:-4, duration: 4, ease: "power4.inOut" });
+                    // gsap.to( light_1.position, {y:-4, duration: 4, ease: "power4.inOut" });
                     $(".firstScroll").trigger("click")
-                  },1000)
+                  },1)
                   clearInterval(interval);
                   interval = 0;
                 }
-              }, 1000);
+              }, 1);
 
           }
       )
@@ -365,13 +363,14 @@ export default class Home{
 
       let showScrollDescritpion = function(){
         $(".scroll_desc span").removeAttr("style");
-        $(".home_scroll_item.active").addClass("animate")
+        $(".home_scroll_item").removeClass("animate");
+        $(".home_scroll_item.active").addClass("animate");
         let active = $('.home_scroll_item.animate');
         let titleLetters = active.find('h3 span');
         let lettersArray = titleLetters.toArray();
         lettersArray.sort(function() {return 0.5-Math.random()});
         gsap.to( lettersArray, {
-          duration: 1,
+          duration: 0.5,
           top: 0,
           opacity: 1,
           stagger: 0.02
@@ -407,6 +406,11 @@ export default class Home{
         gsap.to( parent.refractGlobe.position, that.globalPositions.firstScroll.refractGlobe.position);
 
         detectActiveScroll(t)
+
+        setTimeout(function(){
+          $("body").addClass("ready_to_scroll")
+        },4000)
+
       });
 
       $(document).on('click', '.secondScroll', function (e) {
@@ -467,34 +471,45 @@ export default class Home{
       parent.scene.add(parent.directionalLight)
 
       function myHandler(event, delta) {
-          if (event.originalEvent.wheelDelta > 0) {
-              $("body.action_home").unbind('mousewheel', myHandler);
-              go_to_slide("prev")
-          } else {
-              $("body.action_home").unbind('mousewheel', myHandler)
-              go_to_slide("next")
+          if ($("body").hasClass("ready_to_scroll")) {
+            if (event.originalEvent.wheelDelta > 0) {
+                $("body.action_home").unbind('mousewheel', myHandler);
+                go_to_slide("prev")
+            } else {
+                $("body.action_home").unbind('mousewheel', myHandler)
+                go_to_slide("next")
+            }
           }
       }
 
       function go_to_slide(direction) {
           var a = $(".home_navigation .active");
           if (direction == "prev") {
-            if(a.prev()){
+            if(a.prev().length > 0){
               a.prev().trigger("click");
+              setTimeout(function () {
+                  $("body.action_home").bind("mousewheel", myHandler);
+              }, 4000);
+            }else {
+              $("body.action_home").bind("mousewheel", myHandler);
             }
           } else {
-            if(a.next()){
+            if(a.next().length > 0){
               a.next().trigger("click");
+              setTimeout(function () {
+                  $("body.action_home").bind("mousewheel", myHandler);
+              }, 4000);
+            }else {
+              $("body.action_home").bind("mousewheel", myHandler);
             }
           }
-
-          setTimeout(function () {
-              $("body.action_home").bind("mousewheel", myHandler);
-              $("body").addClass("for_scroll");
-          }, 4000);
       }
 
+
       $("body.action_home").bind("mousewheel", myHandler);
+
+      const fog = new THREE.Fog('#000000',  0.1, 0)
+      parent.scene.fog = fog
 
     }
 }
