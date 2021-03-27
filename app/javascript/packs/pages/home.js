@@ -13,6 +13,11 @@ export default class Home{
       let men, light_1, light_2, woman, globe, floor, totalScene, works;
       let camera = parent.camera;
 
+      parent.home_videos = []
+      const workGroup = new THREE.Group();
+      const workGeometry = new THREE.PlaneGeometry( 0.3, 0.2, 32 );
+      workGroup.position.set(-0.0307, 0, 0.0994);
+
       let titles = document.querySelectorAll('.scroll_desc h3');
       titles.forEach(title => {
         let splitted = title.textContent.split("");
@@ -21,7 +26,6 @@ export default class Home{
             title.innerHTML += "<span>" + element + "</span>";
         });
       })
-
 
       parent.animationParams = {
         globalDuration: 4,
@@ -280,6 +284,22 @@ export default class Home{
               duration: parent.animationParams.globalDuration,
               ease: parent.animationParams.globalEase
             }
+          },
+          works:{
+            position:{
+              x: -2.4655,
+              duration: parent.animationParams.globalDuration,
+              ease: parent.animationParams.globalEase
+            }
+          },
+          workGroup: {
+            position:{
+              x: -0.0307,
+              y: 0,
+              z: 0.0994,
+              duration: parent.animationParams.globalDuration,
+              ease: parent.animationParams.globalEase
+            }
           }
         },
         forthScroll:{
@@ -295,6 +315,22 @@ export default class Home{
               x: THREE.Math.degToRad(0),
               y: THREE.Math.degToRad(69),
               z: THREE.Math.degToRad(0),
+              duration: parent.animationParams.globalDuration,
+              ease: parent.animationParams.globalEase
+            }
+          },
+          works:{
+            position:{
+              x: -2.40,
+              duration: parent.animationParams.globalDuration,
+              ease: parent.animationParams.globalEase
+            }
+          },
+          workGroup: {
+            position:{
+              x: 0,
+              y: 0,
+              z: 0,
               duration: parent.animationParams.globalDuration,
               ease: parent.animationParams.globalEase
             }
@@ -344,6 +380,7 @@ export default class Home{
 
               works = gltf.scene.children.find(x => x.name === "works");
               works.material = new THREE.MeshBasicMaterial( { color: 0x006FFF } );
+              works.position.x = -2.4655;
               works.layers.enable( parent.BLOOM_SCENE );
 
               floor = gltf.scene.children.find(x => x.name === "floor");
@@ -479,15 +516,39 @@ export default class Home{
         // refractGlobe
         gsap.to( parent.refractGlobe.position, that.globalPositions.thirdScroll.refractGlobe.position);
         gsap.to( parent.refractGlobe.scale, that.globalPositions.thirdScroll.refractGlobe.scale);
+        // works
+        gsap.to( works.position, that.globalPositions.thirdScroll.works.position);
+        gsap.to( workGroup.position, that.globalPositions.thirdScroll.workGroup.position);
+
 
         detectActiveScroll(t)
       });
+
+      let projects = document.querySelector('.projects')
+      let scrollbar;
 
       $(document).on('click', '.forthScroll', function (e) {
         var t = $(this);
         // camera
         gsap.to( camera.position, that.globalPositions.forthScroll.camera.position);
         gsap.to( camera.rotation, that.globalPositions.forthScroll.camera.rotation);
+        // works
+        gsap.to( works.position, that.globalPositions.forthScroll.works.position);
+        gsap.to( workGroup.position, that.globalPositions.forthScroll.workGroup.position);
+
+        setTimeout(function () {
+            scrollbar = Scrollbar.init(projects);
+            scrollbar.track.xAxis.element.remove();
+            scrollbar.addListener((s) => {
+                if(s.offset.y == 0) {
+                  scrollbar.destroy()
+                  go_to_slide("prev")
+                }else {
+                  that.camera.position.y = 2.15 - s.offset.y/10000;
+                }
+            })
+            $(".steps_scroll").unbind("mousewheel", myHandler);
+        }, 4000);
 
         detectActiveScroll(t)
       });
@@ -503,57 +564,45 @@ export default class Home{
       parent.directionalLight.position.set(0.25, 3, - 2.25)
       parent.scene.add(parent.directionalLight)
 
-      parent.video = document.getElementById( 'video_texture' );
-      parent.video.load();
-      parent.video.play();
-
-      parent.videoTexture = new THREE.Texture( parent.video );
-      parent.videoTexture.minFilter = THREE.LinearFilter;
-      parent.videoTexture.magFilter = THREE.LinearFilter;
-      parent.videoTexture.center = new THREE.Vector2(0.5, 0.5);
-      parent.videoTexture.rotation = Math.PI;
-      parent.videoTexture.flipY = false;
-
-      const workGeometry = new THREE.PlaneGeometry( 0.3, 0.2, 32 );
-      const workMaterial = new THREE.MeshBasicMaterial( { map: parent.videoTexture, overdraw: true, side:THREE.DoubleSide } );
 
 
-      const workItem = new THREE.Mesh( workGeometry, workMaterial );
-      const workItemSecond = new THREE.Mesh( workGeometry, workMaterial );
-      workItem.position.set(-2.36256, 1.99859, 2.63945)
-      workItemSecond.position.set(-2.36256, 1.78154, 2.63945)
-      workItem.rotation.y = workItemSecond.rotation.y =  -1.45
-
-      workItem.x = -1;
-      workItemSecond.x = -1;
-      parent.scene.add( workItem );
-      parent.scene.add( workItemSecond );
-
-      parent.gui.add(workItemSecond.position, 'x').min(-3).max(3).step(0.00001)
-      parent.gui.add(workItemSecond.position, 'y').min(-3).max(3).step(0.00001)
-      parent.gui.add(workItemSecond.position, 'z').min(-3).max(3).step(0.00001)
 
 
-      const projects = document.querySelector('.projects')
-      const scrollbar = Scrollbar.init(projects);
-      scrollbar.addListener((s) => {
-          if(s.offset.y == 0) {
-            go_to_slide("prev")
-          }else {
-            that.camera.position.y = 2.15 - s.offset.y/10000;
-          }
+
+      $(".home_project_item.with_content").each(function(i){
+        let t = $(this);
+        let video = t.find(".video_holder")[0];
+            video.load();
+            video.play();
+        let videoTexture = new THREE.Texture(video);
+            videoTexture.minFilter = THREE.LinearFilter;
+            videoTexture.magFilter = THREE.LinearFilter;
+            videoTexture.center = new THREE.Vector2(0.5, 0.5);
+            videoTexture.rotation = Math.PI;
+            videoTexture.flipY = false;
+        let workMaterial = new THREE.MeshBasicMaterial( {color:0xFFFFFF, map:videoTexture, side:THREE.DoubleSide } );
+        let workItem = new THREE.Mesh( workGeometry, workMaterial);
+            workItem.position.x = -2.36256;
+            workItem.position.y = 1.99859 - (i*2.2/10);
+            workItem.position.z = 2.63945;
+            workItem.rotation.y = -1.45;
+            workItem.x = -1;
+        let videoItem = [video, videoTexture]
+            parent.home_videos.push(videoItem)
+            workGroup.add( workItem);
       })
 
-      function myHandler(event, delta) {
-          if($(".home_scroll_item[data-scroll='forthScroll']").hasClass('active')){
+      parent.scene.add(workGroup);
 
+
+      function myHandler(event, delta) {
+          $(".steps_scroll").unbind('mousewheel', myHandler);
+          if($(".home_scroll_item[data-scroll='forthScroll']").hasClass('active')){
           }else {
             if ($("body").hasClass("ready_to_scroll")) {
               if (event.originalEvent.wheelDelta > 0) {
-                  $(".steps_scroll").unbind('mousewheel', myHandler);
                   go_to_slide("prev")
               } else {
-                  $(".steps_scroll").unbind('mousewheel', myHandler)
                   go_to_slide("next")
               }
             }
@@ -562,24 +611,33 @@ export default class Home{
       }
 
       function go_to_slide(direction) {
+          var data = jQuery._data($(".steps_scroll")[0], 'events')
           var a = $(".home_navigation .active");
           if (direction == "prev") {
             if(a.prev().length > 0){
               a.prev().trigger("click");
               setTimeout(function () {
-                  $(".steps_scroll").bind("mousewheel", myHandler);
+                  if (data === undefined || data.length === 0) {
+                    $(".steps_scroll").bind("mousewheel", myHandler);
+                  }
               }, 4000);
             }else {
-              $(".steps_scroll").bind("mousewheel", myHandler);
+              if (data === undefined || data.length === 0) {
+                $(".steps_scroll").bind("mousewheel", myHandler);
+              }
             }
           } else {
             if(a.next().length > 0){
               a.next().trigger("click");
               setTimeout(function () {
-                  $(".steps_scroll").bind("mousewheel", myHandler);
+                  if (data === undefined || data.length === 0) {
+                    $(".steps_scroll").bind("mousewheel", myHandler);
+                  }
               }, 4000);
             }else {
-              $(".steps_scroll").bind("mousewheel", myHandler);
+              if (data === undefined || data.length === 0) {
+                $(".steps_scroll").bind("mousewheel", myHandler);
+              }
             }
           }
       }
@@ -591,36 +649,6 @@ export default class Home{
       parent.scene.fog = fog
 
 
-      parent.debugObject.positionX = -0.125
-      parent.debugObject.positionY = 1.9
-      parent.debugObject.positionZ = 1.2
-      parent.debugObject.targetX = 0
-      parent.debugObject.targetY = 74
-      parent.debugObject.targetZ = 0
-      parent.gui.add(parent.debugObject, 'positionX').min(-120).max(120).step(0.0001).onChange(function(){
-        that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
-        that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
-        that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
-        that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
-      })
-      parent.gui.add(parent.debugObject, 'positionY').min(-20).max(20).step(0.0001).onChange(function(){
-        that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
-        that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
-        that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
-        that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
-      })
-      parent.gui.add(parent.debugObject, 'positionZ').min(-20).max(20).step(0.0001).onChange(function(){
-        that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
-        that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
-        that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
-        that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
-      })
-      parent.gui.add(parent.debugObject, 'targetY').min(-180).max(180).step(1).onChange(function(){
-        that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
-        that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
-        that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
-        that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
-      })
 
 
 

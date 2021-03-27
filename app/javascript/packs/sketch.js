@@ -213,7 +213,7 @@ export default class Sketch{
       },4000)
       let that = this
 
-      $("body.action_home").unbind('mousewheel');
+      $(".steps_scroll").unbind('mousewheel');
 
       while(this.scene.children.length > 0){
         this.scene.remove(this.scene.children[0]);
@@ -519,11 +519,13 @@ export default class Sketch{
         window.requestAnimationFrame(this.render.bind(this));
 
         if (document.body.classList.contains('action_home')) {
-          if ( this.video.readyState === this.video.HAVE_ENOUGH_DATA ) {
-        		if ( this.videoTexture ) {
-              this.videoTexture.needsUpdate = true;
-            }
-        	}
+          if ( this.home_videos ) {
+            this.home_videos.forEach(function(videoItem) {
+                if ( videoItem[0].readyState === videoItem[0].HAVE_ENOUGH_DATA ) {
+                    videoItem[1].needsUpdate = true;
+                }
+            });
+          }
         }
 
         if (document.body.classList.contains('action_about')) {
