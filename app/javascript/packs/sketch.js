@@ -15,6 +15,7 @@ const TWEEN = require('@tweenjs/tween.js')
 
 import Home from './pages/home';
 import Works from './pages/works';
+import Partners from './pages/partners';
 
 
 
@@ -168,6 +169,12 @@ export default class Sketch{
         });
 
 
+        /* -------------------- load GLTSF  --------------------  */
+
+        this.gltfLoader.load('/models/composition_3.gltf',(gltf) =>{})
+        this.gltfLoader.load('/models/hands.gltf',(gltf) =>{})
+        this.gltfLoader.load('/models/works.gltf',(gltf) =>{})
+
         /* -------------------- bloomPass params  --------------------  */
         this.ENTIRE_SCENE = 0;
         this.BLOOM_SCENE = 1;
@@ -224,6 +231,8 @@ export default class Sketch{
       }
       else if (document.body.classList.contains('action_works')) {
         new Works({this: this});
+      }else if (document.body.classList.contains('action_partners')) {
+        new Partners({this: this});
       }else if (document.body.classList.contains('action_about')) {
         this.camera.position.set(0, 0, 2)
         this.camera.lookAt(0, 0, 0)
@@ -378,10 +387,10 @@ export default class Sketch{
         mesh.receiveShadow = true;
         this.scene.add(mesh)
 
-        const scroll = Scrollbar.init(document.querySelector('.partners_content'));
-        scroll.addListener((s) => {
-            that.camera.position.y = -s.offset.y / 1000;
-        })
+        // const scroll = Scrollbar.init(document.querySelector('.partners_content'));
+        // scroll.addListener((s) => {
+        //     that.camera.position.y = -s.offset.y / 1000;
+        // })
 
 
       }

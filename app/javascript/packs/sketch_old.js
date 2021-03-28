@@ -203,47 +203,47 @@ export default class Sketch{
       let that = this
 
 
-      this.debugObject.positionX = 7.8
-      this.debugObject.positionY = 1.5
-      this.debugObject.positionZ = 0
-      this.debugObject.targetX = 0
-      this.debugObject.targetY = 90
-      this.debugObject.targetZ = 0
-      this.gui.add(this.debugObject, 'positionX').min(-120).max(120).step(0.0001).onChange(function(){
-        that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
-        that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
-        that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
-        that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
+      parent.debugObject.positionX = 7.8
+      parent.debugObject.positionY = 1.5
+      parent.debugObject.positionZ = 0
+      parent.debugObject.targetX = 0
+      parent.debugObject.targetY = 90
+      parent.debugObject.targetZ = 0
+      parent.gui.add(parent.debugObject, 'positionX').min(-120).max(120).step(0.0001).onChange(function(){
+        parent.camera.position.set(parent.debugObject.positionX, parent.debugObject.positionY, parent.debugObject.positionZ)
+        parent.camera.rotation.x = THREE.Math.degToRad(parent.debugObject.targetX);
+        parent.camera.rotation.y = THREE.Math.degToRad(parent.debugObject.targetY);
+        parent.camera.rotation.z = THREE.Math.degToRad(parent.debugObject.targetZ);
       })
-      this.gui.add(this.debugObject, 'positionY').min(-20).max(20).step(0.0001).onChange(function(){
-        that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
-        that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
-        that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
-        that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
+      parent.gui.add(parent.debugObject, 'positionY').min(-20).max(20).step(0.0001).onChange(function(){
+        parent.camera.position.set(parent.debugObject.positionX, parent.debugObject.positionY, parent.debugObject.positionZ)
+        parent.camera.rotation.x = THREE.Math.degToRad(parent.debugObject.targetX);
+        parent.camera.rotation.y = THREE.Math.degToRad(parent.debugObject.targetY);
+        parent.camera.rotation.z = THREE.Math.degToRad(parent.debugObject.targetZ);
       })
-      this.gui.add(this.debugObject, 'positionZ').min(-20).max(20).step(0.0001).onChange(function(){
-        that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
-        that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
-        that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
-        that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
+      parent.gui.add(parent.debugObject, 'positionZ').min(-20).max(20).step(0.0001).onChange(function(){
+        parent.camera.position.set(parent.debugObject.positionX, parent.debugObject.positionY, parent.debugObject.positionZ)
+        parent.camera.rotation.x = THREE.Math.degToRad(parent.debugObject.targetX);
+        parent.camera.rotation.y = THREE.Math.degToRad(parent.debugObject.targetY);
+        parent.camera.rotation.z = THREE.Math.degToRad(parent.debugObject.targetZ);
       })
-      this.gui.add(this.debugObject, 'targetX').min(-180).max(180).step(1).onChange(function(){
-        that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
-        that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
-        that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
-        that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
+      parent.gui.add(parent.debugObject, 'targetX').min(-180).max(180).step(1).onChange(function(){
+        parent.camera.position.set(parent.debugObject.positionX, parent.debugObject.positionY, parent.debugObject.positionZ)
+        parent.camera.rotation.x = THREE.Math.degToRad(parent.debugObject.targetX);
+        parent.camera.rotation.y = THREE.Math.degToRad(parent.debugObject.targetY);
+        parent.camera.rotation.z = THREE.Math.degToRad(parent.debugObject.targetZ);
       })
-      this.gui.add(this.debugObject, 'targetY').min(-180).max(180).step(1).onChange(function(){
-        that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
-        that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
-        that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
-        that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
+      parent.gui.add(parent.debugObject, 'targetY').min(-180).max(180).step(1).onChange(function(){
+        parent.camera.position.set(parent.debugObject.positionX, parent.debugObject.positionY, parent.debugObject.positionZ)
+        parent.camera.rotation.x = THREE.Math.degToRad(parent.debugObject.targetX);
+        parent.camera.rotation.y = THREE.Math.degToRad(parent.debugObject.targetY);
+        parent.camera.rotation.z = THREE.Math.degToRad(parent.debugObject.targetZ);
       })
-      this.gui.add(this.debugObject, 'targetZ').min(-180).max(180).step(1).onChange(function(){
-        that.camera.position.set(that.debugObject.positionX, that.debugObject.positionY, that.debugObject.positionZ)
-        that.camera.rotation.x = THREE.Math.degToRad(that.debugObject.targetX);
-        that.camera.rotation.y = THREE.Math.degToRad(that.debugObject.targetY);
-        that.camera.rotation.z = THREE.Math.degToRad(that.debugObject.targetZ);
+      parent.gui.add(parent.debugObject, 'targetZ').min(-180).max(180).step(1).onChange(function(){
+        parent.camera.position.set(parent.debugObject.positionX, parent.debugObject.positionY, parent.debugObject.positionZ)
+        parent.camera.rotation.x = THREE.Math.degToRad(parent.debugObject.targetX);
+        parent.camera.rotation.y = THREE.Math.degToRad(parent.debugObject.targetY);
+        parent.camera.rotation.z = THREE.Math.degToRad(parent.debugObject.targetZ);
       })
 
       while(this.scene.children.length > 0){

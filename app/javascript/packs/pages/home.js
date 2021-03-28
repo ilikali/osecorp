@@ -91,9 +91,9 @@ export default class Home{
           },
           globe:{
             position:{
-              x: -0.61,
-              y: 3.244,
-              z: 1,
+              x: 60,
+              y: 60,
+              z: 60,
               duration: parent.animationParams.globalDuration,
               ease: parent.animationParams.globalEase
             },
@@ -647,6 +647,7 @@ export default class Home{
 
       const fog = new THREE.Fog('#000000',  0.1, 0)
       parent.scene.fog = fog
+
 
 
 
