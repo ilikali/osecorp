@@ -19,6 +19,8 @@ export default class Partners{
           '/models/hands_2.gltf',
           (gltf) =>
           {
+              $('.fader').fadeOut(1000);
+
               gltf.scene.scale.set(0.2, 0.2, 0.2);
               hands = gltf.scene.children[0]
               console.log(hands.material)

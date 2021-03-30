@@ -13,6 +13,7 @@ export default class Works{
           '/models/works.gltf',
           (gltf) =>
           {
+              $('.fader').fadeOut(1000);
               gltf.scene.scale.set(1, 1, 1);
               parent.scene.add(gltf.scene)
               parent.updateAllMaterials()

@@ -169,12 +169,6 @@ export default class Sketch{
         });
 
 
-        /* -------------------- load GLTSF  --------------------  */
-
-        this.gltfLoader.load('/models/composition_3.gltf',(gltf) =>{})
-        this.gltfLoader.load('/models/hands.gltf',(gltf) =>{})
-        this.gltfLoader.load('/models/works.gltf',(gltf) =>{})
-
         /* -------------------- bloomPass params  --------------------  */
         this.ENTIRE_SCENE = 0;
         this.BLOOM_SCENE = 1;
@@ -214,12 +208,10 @@ export default class Sketch{
     }
 
     initScene(){
-      $('.fader').fadeOut(1000);
       setTimeout(function(){
         $("a").removeClass("disabled");
       },4000)
-      let that = this
-
+      let that = this;
       $(".steps_scroll").unbind('mousewheel');
 
       while(this.scene.children.length > 0){

@@ -342,6 +342,8 @@ export default class Home{
           '/models/composition_3.gltf',
           (gltf) =>
           {
+              $('.fader').fadeOut(1000);
+              
               totalScene = gltf.scene
 
               const cursor = {
