@@ -32,6 +32,8 @@ export default class Home{
         globalEase: "power4.inOut",
       }
 
+
+
       parent.globalPositions = {
         firstScroll:{
           camera:{
@@ -338,12 +340,68 @@ export default class Home{
         }
       }
 
+      if (parent.isMobile) {
+          that.globalPositions.firstScroll.camera.position = {
+            x: 6.01,
+            y: 0.29,
+            z: 4.2,
+            duration: parent.animationParams.globalDuration,
+            ease: parent.animationParams.globalEase
+          }
+      }
+
+
+
+
+      parent.debugObject.positionX = 0
+      parent.debugObject.positionY = 1.76
+      parent.debugObject.positionZ = 0
+      parent.debugObject.targetX = 0
+      parent.debugObject.targetY = 53
+      parent.debugObject.targetZ = 0
+      parent.gui.add(parent.debugObject, 'positionX').min(-20).max(20).step(0.0001).onChange(function(){
+        parent.camera.position.set(parent.debugObject.positionX, parent.debugObject.positionY, parent.debugObject.positionZ)
+        parent.camera.rotation.x = THREE.Math.degToRad(parent.debugObject.targetX);
+        parent.camera.rotation.y = THREE.Math.degToRad(parent.debugObject.targetY);
+        parent.camera.rotation.z = THREE.Math.degToRad(parent.debugObject.targetZ);
+      })
+      parent.gui.add(parent.debugObject, 'positionY').min(-20).max(20).step(0.0001).onChange(function(){
+        parent.camera.position.set(parent.debugObject.positionX, parent.debugObject.positionY, parent.debugObject.positionZ)
+        parent.camera.rotation.x = THREE.Math.degToRad(parent.debugObject.targetX);
+        parent.camera.rotation.y = THREE.Math.degToRad(parent.debugObject.targetY);
+        parent.camera.rotation.z = THREE.Math.degToRad(parent.debugObject.targetZ);
+      })
+      parent.gui.add(parent.debugObject, 'positionZ').min(-20).max(20).step(0.0001).onChange(function(){
+        parent.camera.position.set(parent.debugObject.positionX, parent.debugObject.positionY, parent.debugObject.positionZ)
+        parent.camera.rotation.x = THREE.Math.degToRad(parent.debugObject.targetX);
+        parent.camera.rotation.y = THREE.Math.degToRad(parent.debugObject.targetY);
+        parent.camera.rotation.z = THREE.Math.degToRad(parent.debugObject.targetZ);
+      })
+      parent.gui.add(parent.debugObject, 'targetX').min(-180).max(180).step(1).onChange(function(){
+        parent.camera.position.set(parent.debugObject.positionX, parent.debugObject.positionY, parent.debugObject.positionZ)
+        parent.camera.rotation.x = THREE.Math.degToRad(parent.debugObject.targetX);
+        parent.camera.rotation.y = THREE.Math.degToRad(parent.debugObject.targetY);
+        parent.camera.rotation.z = THREE.Math.degToRad(parent.debugObject.targetZ);
+      })
+      parent.gui.add(parent.debugObject, 'targetY').min(-180).max(180).step(1).onChange(function(){
+        parent.camera.position.set(parent.debugObject.positionX, parent.debugObject.positionY, parent.debugObject.positionZ)
+        parent.camera.rotation.x = THREE.Math.degToRad(parent.debugObject.targetX);
+        parent.camera.rotation.y = THREE.Math.degToRad(parent.debugObject.targetY);
+        parent.camera.rotation.z = THREE.Math.degToRad(parent.debugObject.targetZ);
+      })
+      parent.gui.add(parent.debugObject, 'targetZ').min(-180).max(180).step(1).onChange(function(){
+        parent.camera.position.set(parent.debugObject.positionX, parent.debugObject.positionY, parent.debugObject.positionZ)
+        parent.camera.rotation.x = THREE.Math.degToRad(parent.debugObject.targetX);
+        parent.camera.rotation.y = THREE.Math.degToRad(parent.debugObject.targetY);
+        parent.camera.rotation.z = THREE.Math.degToRad(parent.debugObject.targetZ);
+      })
+
       parent.gltfLoader.load(
           '/models/composition_3.gltf',
           (gltf) =>
           {
               $('.fader').fadeOut(1000);
-              
+
               totalScene = gltf.scene
 
               const cursor = {
@@ -472,6 +530,7 @@ export default class Home{
 
         setTimeout(function(){
           $("body").addClass("ready_to_scroll")
+          console.log(camera.position)
         },4000)
 
       });
@@ -596,6 +655,10 @@ export default class Home{
 
       parent.scene.add(workGroup);
 
+      const fog = new THREE.Fog('#000000',  0.1, 0);
+      parent.scene.fog = fog
+
+
 
       function myHandler(event, delta) {
           $(".steps_scroll").unbind('mousewheel', myHandler);
@@ -609,46 +672,58 @@ export default class Home{
               }
             }
           }
+      }
 
+
+      var lastPoint = null;
+
+      function myHandlerMobile(e) {
+
+          var currentPoint = e.originalEvent.changedTouches[0].pageY;
+          if(lastPoint != null && lastPoint < currentPoint ){
+              console.log("prev")
+              go_to_slide("prev")
+          }else if(lastPoint != null && lastPoint > currentPoint){
+              console.log("next")
+              go_to_slide("next")
+          }
+          lastPoint = currentPoint;
+          // $(".steps_scroll").unbind('touchend', myHandlerMobile);
       }
 
       function go_to_slide(direction) {
-          var data = jQuery._data($(".steps_scroll")[0], 'events')
           var a = $(".home_navigation .active");
           if (direction == "prev") {
             if(a.prev().length > 0){
               a.prev().trigger("click");
               setTimeout(function () {
-                  if (data === undefined || data.length === 0) {
                     $(".steps_scroll").bind("mousewheel", myHandler);
-                  }
+                    $(".steps_scroll").bind('touchend', myHandlerMobile);
               }, 4000);
             }else {
-              if (data === undefined || data.length === 0) {
                 $(".steps_scroll").bind("mousewheel", myHandler);
-              }
+                $(".steps_scroll").bind('touchend', myHandlerMobile);
             }
           } else {
             if(a.next().length > 0){
               a.next().trigger("click");
               setTimeout(function () {
-                  if (data === undefined || data.length === 0) {
                     $(".steps_scroll").bind("mousewheel", myHandler);
-                  }
+                    $(".steps_scroll").bind('touchend', myHandlerMobile);
               }, 4000);
             }else {
-              if (data === undefined || data.length === 0) {
                 $(".steps_scroll").bind("mousewheel", myHandler);
-              }
+                $(".steps_scroll").bind('touchend', myHandlerMobile);
             }
           }
       }
 
 
       $(".steps_scroll").bind("mousewheel", myHandler);
+      $(".steps_scroll").bind('touchend', myHandlerMobile);
 
-      const fog = new THREE.Fog('#000000',  0.1, 0)
-      parent.scene.fog = fog
+
+
 
 
 

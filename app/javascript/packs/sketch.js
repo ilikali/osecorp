@@ -122,7 +122,9 @@ export default class Sketch{
 
         this.stats = new Stats()
         this.stats.showPanel(0)
-        document.body.appendChild(this.stats.dom)
+        // document.body.appendChild(this.stats.dom)
+
+        this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 
         /* -------------------- audio player --------------------  */
@@ -485,6 +487,7 @@ export default class Sketch{
         this.renderer.setSize( this.width,this.height );
         this.camera.aspect = this.width/this.height;
         this.camera.updateProjectionMatrix();
+        this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     }
 
     darkenNonBloomed() {
