@@ -609,7 +609,7 @@ height: 5000px;
 
 
 
-.works_scroll {
+.works_page_holder {
 width: 100vw;
 height: 100vh;
 }
@@ -907,13 +907,107 @@ padding: 100px 0 200px 0;
 margin: 0px;
 }
 
+.works_slider {
+width: 200vw;
+height: 100vh;
+display: flex;
+}
+
+.work_slide {
+width: 100vw;
+height: 65vh;
+display: flex;
+align-items: center;
+justify-content: flex-end;
+}
 
 @media screen and (max-width: 1000px) {
 
+  body {
+  overscroll-behavior: none;
+  touch-action: none;
+  }
+
+  .steps_scroll {
+  height: 100vh;
+  width: 100vw;
+  }
+
+  .dg {
+  display: none !important;
+  }
 
   .dg.main {
   width: 100% !important;
   margin: 0px;
+  }
+
+  .scroll_desc {
+  width: 100%;
+  }
+
+  .scroll_desc h3 {
+  font-size: 25px;
+  line-height: 30px;
+  }
+
+  .scroll_desc p {
+  font-size: 14px;
+  }
+
+  .scroll_desc h3 {
+  margin: 0 0 5px 0;
+  }
+
+  header {
+  padding: 20px;
+  }
+
+  .logo_self {
+  width: 40px;
+  height: 40px;
+  margin: 0 5px 0 0;
+  }
+
+  .type {
+  width: 105px;
+  height: 40px;
+  }
+
+  .head_right nav {
+  display: none;
+  }
+
+  footer {
+  padding: 0 20px 25px 20px;
+  align-items: center;
+  }
+
+  .copyright {
+  font-size: 13px;
+  }
+
+  .copyright span {
+  display: none;
+  }
+
+  .firstScroll_content .scroll_content{
+  align-items: flex-end;
+  padding: 0px 30px 160px;
+  }
+
+  .secondScroll_content .scroll_content{
+  align-items: flex-start;
+  padding: 160px 30px 0px;
+  }
+
+  .scroller b {
+  font-size: 11px;
+  text-align: center;
+  }
+
+  .scroller_self {
+  height: 45px;
   }
 
 }

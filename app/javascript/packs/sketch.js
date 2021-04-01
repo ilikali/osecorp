@@ -3,7 +3,6 @@ import * as THREE from 'three'
 import * as dat from 'dat.gui'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
-import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
@@ -122,7 +121,7 @@ export default class Sketch{
 
         this.stats = new Stats()
         this.stats.showPanel(0)
-        // document.body.appendChild(this.stats.dom)
+        document.body.appendChild(this.stats.dom)
 
         this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
@@ -178,6 +177,76 @@ export default class Sketch{
         this.bloomLayer.set( this.BLOOM_SCENE );
         this.materials = {};
 
+
+        this.terrain;
+
+        this.color_material =  new THREE.ShaderMaterial({
+          fragmentShader: `
+          uniform vec3 iResolution;
+          uniform float iTime;
+          #ifdef GL_ES
+          precision mediump float;
+          #endif
+
+          #define RADIANS 0.017453292519943295
+
+          varying vec2 vUv;
+          const int zoom = 50;
+          const float brightness = 0.975;
+          float fScale = 10.25;
+
+          float cosRange(float degrees, float range, float minimum) {
+          return (((1.0 + cos(degrees * RADIANS)) * 0.5) * range) + minimum;
+          }
+
+          void mainImage( out vec4 fragColor, in vec2 fragCoord )
+          {
+          float time = iTime * 1.25;
+          vec2 uv = fragCoord.xy / iResolution.xy;
+          vec2 p  = (2.0*fragCoord.xy-iResolution.xy)/max(iResolution.x,iResolution.y);
+          float ct = cosRange(time*30.0, 3.0, 1.1);
+          float xBoost = cosRange(time*1.0, 5.0, 5.0);
+          float yBoost = cosRange(time*0.1, 10.0, 5.0);
+
+          fScale = cosRange(time * 15.5, 1.25, 0.5);
+
+          for(int i=1;i<zoom;i++) {
+            float _i = float(i);
+            vec2 newp=p;
+            newp.x+=0.25/_i*sin(_i*p.y+time*cos(ct)*0.5/20.0+0.005*_i)*fScale+xBoost;
+            newp.y+=0.25/_i*sin(_i*p.x+time*ct*0.3/40.0+0.03*float(i+15))*fScale+yBoost;
+            p=newp;
+          }
+
+          vec3 col=vec3(0.5*sin(3.0*p.x)+0.5,0.5*sin(3.0*p.y)+0.5,sin(p.x+p.y));
+          col *= brightness;
+
+            // Add border
+            float vigAmt = 5.0;
+            float vignette = (1.-vigAmt*(uv.y-.5)*(uv.y-.5))*(1.-vigAmt*(uv.x-.5)*(uv.x-.5));
+          float extrusion = (col.x + col.y + col.z) / 4.0;
+            extrusion *= 1.5;
+            extrusion *= vignette;
+
+          fragColor = vec4(col, extrusion);
+          }
+
+          void main() {
+            mainImage(gl_FragColor, vUv * iResolution.xy);
+          }
+          `,
+          vertexShader: `
+            varying vec2 vUv;
+            void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+            }
+          `,
+          uniforms: {
+            iTime: { value: 0 },
+            iResolution:  { value: new THREE.Vector3(1,1,1) },
+          }
+        });
 
         this.initScene();
         this.addCursor();
@@ -522,6 +591,8 @@ export default class Sketch{
         this.composer.render()
         window.requestAnimationFrame(this.render.bind(this));
 
+        this.color_material.uniforms.iTime.value = elapsedTime;
+
         if (document.body.classList.contains('action_home')) {
           if ( this.home_videos ) {
             this.home_videos.forEach(function(videoItem) {
@@ -530,6 +601,15 @@ export default class Sketch{
                 }
             });
           }
+        }
+
+        if (document.body.classList.contains('action_partners')) {
+          // parent.settings.uTime = elapsedTime
+          this.terrain.material.uniforms.time.value = elapsedTime;
+        }
+
+        if (document.body.classList.contains('action_works')) {
+
         }
 
         if (document.body.classList.contains('action_about')) {

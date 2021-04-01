@@ -18,14 +18,16 @@ export default class Home{
       const workGeometry = new THREE.PlaneGeometry( 0.3, 0.2, 32 );
       workGroup.position.set(-0.0307, 0, 0.0994);
 
-      let titles = document.querySelectorAll('.scroll_desc h3');
-      titles.forEach(title => {
-        let splitted = title.textContent.split("");
-        title.textContent = "";
-        splitted.forEach((element) => {
-            title.innerHTML += "<span>" + element + "</span>";
-        });
-      })
+      if (!parent.isMobile) {
+        let titles = document.querySelectorAll('.scroll_desc h3');
+        titles.forEach(title => {
+          let splitted = title.textContent.split("");
+          title.textContent = "";
+          splitted.forEach((element) => {
+              title.innerHTML += "<span>" + element + "</span>";
+          });
+        })
+      }
 
       parent.animationParams = {
         globalDuration: 4,
@@ -342,20 +344,62 @@ export default class Home{
 
       if (parent.isMobile) {
           that.globalPositions.firstScroll.camera.position = {
-            x: 6.01,
-            y: 0.29,
-            z: 4.2,
+            x: 5,
+            y: 0.7,
+            z: 3.2,
             duration: parent.animationParams.globalDuration,
             ease: parent.animationParams.globalEase
           }
+
+          that.globalPositions.secondScroll.camera.position = {
+            x: 1.15,
+            y: 2,
+            z: 0.25,
+            duration: parent.animationParams.globalDuration,
+            ease: parent.animationParams.globalEase
+          }
+
+          that.globalPositions.secondScroll.camera.rotation = {
+            x: THREE.Math.degToRad(-5),
+            y: THREE.Math.degToRad(74),
+            z: THREE.Math.degToRad(0),
+            duration: parent.animationParams.globalDuration,
+            ease: parent.animationParams.globalEase
+          }
+
+          that.globalPositions.secondScroll.men.rotation = {
+            x: 1.6,
+            y: 0,
+            z: 0.2,
+            duration: parent.animationParams.globalDuration,
+            ease: parent.animationParams.globalEase
+          }
+
+          that.globalPositions.thirdScroll.camera.position = {
+            x: 0.37,
+            y: 1.98,
+            z: 1.68,
+            duration: parent.animationParams.globalDuration,
+            ease: parent.animationParams.globalEase
+          }
+
+          that.globalPositions.thirdScroll.camera.rotation = {
+            x: THREE.Math.degToRad(0),
+            y: THREE.Math.degToRad(53),
+            z: THREE.Math.degToRad(0),
+            duration: parent.animationParams.globalDuration,
+            ease: parent.animationParams.globalEase
+          }
+
+
       }
 
 
 
 
-      parent.debugObject.positionX = 0
-      parent.debugObject.positionY = 1.76
-      parent.debugObject.positionZ = 0
+      parent.debugObject.positionX = 0.37
+      parent.debugObject.positionY = 1.98
+      parent.debugObject.positionZ = 1.3
       parent.debugObject.targetX = 0
       parent.debugObject.targetY = 53
       parent.debugObject.targetZ = 0
@@ -409,14 +453,15 @@ export default class Home{
                   y: 0
               }
 
-              // window.addEventListener('mousemove', (event) =>{
-              //     cursor.x = event.clientX / that.width - 0.5
-              //     cursor.y = event.clientY / that.height - 0.5
-              //
-              //     totalScene.position.x = cursor.x/80
-              //     totalScene.position.y = cursor.y/80
-              //     // $(".project_video").css("transform","translate3d("+cursor.x*100+"px,"+cursor.y*100+"px,0px)");
-              // })
+              $(document).on('mousemove', '.home_page_holder', function (event) {
+                cursor.x = event.clientX / that.width - 0.5
+                cursor.y = event.clientY / that.height - 0.5
+
+                totalScene.position.x = cursor.x/80
+                totalScene.position.y = cursor.y/80
+              });
+
+
 
               gltf.scene.scale.set(1, 1, 1);
 
@@ -487,15 +532,17 @@ export default class Home{
         $(".home_scroll_item").removeClass("animate");
         $(".home_scroll_item.active").addClass("animate");
         let active = $('.home_scroll_item.animate');
-        let titleLetters = active.find('h3 span');
-        let lettersArray = titleLetters.toArray();
-        lettersArray.sort(function() {return 0.5-Math.random()});
-        gsap.to( lettersArray, {
-          duration: 0.5,
-          top: 0,
-          opacity: 1,
-          stagger: 0.02
-        }).play();
+        if (!parent.isMobile) {
+          let titleLetters = active.find('h3 span');
+          let lettersArray = titleLetters.toArray();
+          lettersArray.sort(function() {return 0.5-Math.random()});
+          gsap.to( lettersArray, {
+            duration: 0.5,
+            top: 0,
+            opacity: 1,
+            stagger: 0.02
+          }).play();
+        }
       }
 
       let detectActiveScroll = function(t){
