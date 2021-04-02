@@ -121,7 +121,7 @@ export default class Sketch{
 
         this.stats = new Stats()
         this.stats.showPanel(0)
-        document.body.appendChild(this.stats.dom)
+        // document.body.appendChild(this.stats.dom)
 
         this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
@@ -137,14 +137,14 @@ export default class Sketch{
 
         $(document).on('click', '.audio_swither', function (e) {
           var t = $(this);
-              if(t.hasClass("mute")){
-                gsap.to( that.audioListener.gain.gain, {value:1, duration: 2});
-                t.removeClass("mute")
-              }else {
-                gsap.to( that.audioListener.gain.gain, {value:0, duration: 2});
-                t.addClass("mute")
-              }
-          })
+            if(t.hasClass("mute")){
+              gsap.to( that.audioListener.gain.gain, {value:1, duration: 2});
+              t.removeClass("mute")
+            }else {
+              gsap.to( that.audioListener.gain.gain, {value:0, duration: 2});
+              t.addClass("mute")
+            }
+        })
 
         /* -------------------- link clickes --------------------  */
 
@@ -168,6 +168,24 @@ export default class Sketch{
               history.pushState({page:url}, null, url);
             }
         });
+
+
+        /* -------------------- menu opener --------------------  */
+
+        $(document).on('click', '.menu_opener', function (e) {
+          var t = $(this);
+            if(t.hasClass("active")){
+              $(".mobile_menu").fadeOut();
+              t.removeClass("active")
+            }else {
+              $(".mobile_menu").fadeIn();
+              t.addClass("active")
+            }
+        })
+        $(document).on('click', '.mobile_menu a', function (e) {
+          $(".mobile_menu").fadeOut();
+          $(".menu_opener").removeClass("active")
+        })
 
 
         /* -------------------- bloomPass params  --------------------  */

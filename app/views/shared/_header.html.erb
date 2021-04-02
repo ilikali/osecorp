@@ -11,12 +11,25 @@
         </div>
     </div>
     <div class="head_right">
+      <button class="menu_opener"></button>
       <nav>
         <ul>
           <li><%= active_link_to "Works", works_path, class: "main_nav_link" %></li>
           <li><%= active_link_to "Partners", parters_path, class: "main_nav_link" %></li>
           <li><%= active_link_to "Contacts", contacts_path, class: "main_nav_link" %></li>
         </ul>
-
+      </nav>
     </div>
 </header>
+<div class="mobile_menu">
+  <nav>
+    <ul>
+      <li><%= active_link_to "Works", works_path, class: "main_nav_link" %></li>
+      <li><%= active_link_to "Partners", parters_path, class: "main_nav_link" %></li>
+      <li><%= active_link_to "Contacts", contacts_path, class: "main_nav_link" %></li>
+    </ul>
+  </nav>
+  <video poster="" muted="" loop="" class="video" autoplay="" playsinline="">
+      <source src="<%= asset_url('logo.mp4') %>" type="video/mp4">
+  </video>
+</div>

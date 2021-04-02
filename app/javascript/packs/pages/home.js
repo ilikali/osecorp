@@ -34,8 +34,6 @@ export default class Home{
         globalEase: "power4.inOut",
       }
 
-
-
       parent.globalPositions = {
         firstScroll:{
           camera:{
@@ -107,6 +105,15 @@ export default class Home{
               x: -0.61,
               y: 3.244,
               z: 1,
+              duration: parent.animationParams.globalDuration,
+              ease: parent.animationParams.globalEase
+            },
+          },
+          light_2: {
+            position:{
+              x: -1.459,
+              y: 1.969,
+              z: -0.335,
               duration: parent.animationParams.globalDuration,
               ease: parent.animationParams.globalEase
             },
@@ -199,6 +206,15 @@ export default class Home{
               duration: parent.animationParams.globalDuration,
               ease: parent.animationParams.globalEase
             }
+          },
+          light_2: {
+            position:{
+              x: -1.459,
+              y: 1.969,
+              z: -0.335,
+              duration: parent.animationParams.globalDuration,
+              ease: parent.animationParams.globalEase
+            },
           }
         },
         thirdScroll:{
@@ -304,6 +320,15 @@ export default class Home{
               duration: parent.animationParams.globalDuration,
               ease: parent.animationParams.globalEase
             }
+          },
+          light_2: {
+            position:{
+              x: -1.459,
+              y: 1.969,
+              z: -0.335,
+              duration: parent.animationParams.globalDuration,
+              ease: parent.animationParams.globalEase
+            },
           }
         },
         forthScroll:{
@@ -375,9 +400,17 @@ export default class Home{
             ease: parent.animationParams.globalEase
           }
 
+          that.globalPositions.secondScroll.light_2.position = {
+            x: -1.459,
+            y: 1.76,
+            z: -0.335,
+            duration: parent.animationParams.globalDuration,
+            ease: parent.animationParams.globalEase
+          }
+
           that.globalPositions.thirdScroll.camera.position = {
             x: 0.37,
-            y: 1.98,
+            y: 2.1,
             z: 1.68,
             duration: parent.animationParams.globalDuration,
             ease: parent.animationParams.globalEase
@@ -391,17 +424,34 @@ export default class Home{
             ease: parent.animationParams.globalEase
           }
 
+          that.globalPositions.thirdScroll.light_2.position = {
+            x: -1.459,
+            y: 1.45,
+            z: -0.235,
+            duration: parent.animationParams.globalDuration,
+            ease: parent.animationParams.globalEase
+          }
+
+          that.globalPositions.forthScroll.camera.position = {
+            x: -1.5,
+            y: 2,
+            z: 2.9,
+            duration: parent.animationParams.globalDuration,
+            ease: parent.animationParams.globalEase
+          }
+
+
 
       }
 
 
 
 
-      parent.debugObject.positionX = 0.37
-      parent.debugObject.positionY = 1.98
-      parent.debugObject.positionZ = 1.3
+      parent.debugObject.positionX = -2.09
+      parent.debugObject.positionY = 2.15
+      parent.debugObject.positionZ = 2.63
       parent.debugObject.targetX = 0
-      parent.debugObject.targetY = 53
+      parent.debugObject.targetY = 69
       parent.debugObject.targetZ = 0
       parent.gui.add(parent.debugObject, 'positionX').min(-20).max(20).step(0.0001).onChange(function(){
         parent.camera.position.set(parent.debugObject.positionX, parent.debugObject.positionY, parent.debugObject.positionZ)
@@ -478,6 +528,8 @@ export default class Home{
               light_2 = gltf.scene.children.find(x => x.name === "light_2");
               light_2.material = new THREE.MeshBasicMaterial( { color: 0x006FFF } );
               light_2.layers.enable( parent.BLOOM_SCENE );
+
+              console.log(light_2.position)
 
               // light_1.position.y = 10
               // light_1.material = new THREE.MeshBasicMaterial( { color: 0x006FFF } );
@@ -572,6 +624,8 @@ export default class Home{
         gsap.to( globe.position, that.globalPositions.firstScroll.globe.position);
         // refractGlobe
         gsap.to( parent.refractGlobe.position, that.globalPositions.firstScroll.refractGlobe.position);
+        // light_2
+        gsap.to( light_2.position, that.globalPositions.firstScroll.light_2.position);
 
         detectActiveScroll(t)
 
@@ -596,6 +650,8 @@ export default class Home{
         // refractGlobe
         gsap.to( parent.refractGlobe.position, that.globalPositions.secondScroll.refractGlobe.position);
         gsap.to( parent.refractGlobe.scale, that.globalPositions.secondScroll.refractGlobe.scale);
+        // light_2
+        gsap.to( light_2.position, that.globalPositions.secondScroll.light_2.position);
         // woman
         setTimeout(function(){
           gsap.to( woman.position, that.globalPositions.secondScroll.woman.position);
@@ -627,6 +683,8 @@ export default class Home{
         // works
         gsap.to( works.position, that.globalPositions.thirdScroll.works.position);
         gsap.to( workGroup.position, that.globalPositions.thirdScroll.workGroup.position);
+        // light_2
+        gsap.to( light_2.position, that.globalPositions.thirdScroll.light_2.position);
 
 
         detectActiveScroll(t)
@@ -650,12 +708,18 @@ export default class Home{
             scrollbar.addListener((s) => {
                 if(s.offset.y == 0) {
                   scrollbar.destroy()
-                  go_to_slide("prev")
+                  go_to_slide("prev");
+                  $(".steps_scroll").unbind('touchend', myHandlerMobile);
                 }else {
-                  that.camera.position.y = 2.15 - s.offset.y/10000;
+                  if (parent.isMobile) {
+                    that.camera.position.y = 2 - s.offset.y/1000;
+                  }else {
+                    that.camera.position.y = 2.15 - s.offset.y/10000;
+                  }
                 }
             })
             $(".steps_scroll").unbind("mousewheel", myHandler);
+            $(".steps_scroll").unbind('touchend', myHandlerMobile);
         }, 4000);
 
         detectActiveScroll(t)
@@ -722,20 +786,21 @@ export default class Home{
       }
 
 
-      var lastPoint = null;
+
+      var touchStartY;
 
       function myHandlerMobile(e) {
 
-          var currentPoint = e.originalEvent.changedTouches[0].pageY;
-          if(lastPoint != null && lastPoint < currentPoint ){
-              console.log("prev")
-              go_to_slide("prev")
-          }else if(lastPoint != null && lastPoint > currentPoint){
+          var touchEndY = e.changedTouches[0].clientY;
+          if (touchStartY > touchEndY + 5) {
+              $(".steps_scroll").unbind('touchend', myHandlerMobile);
               console.log("next")
               go_to_slide("next")
+          } else if (touchStartY < touchEndY - 5) {
+              $(".steps_scroll").unbind('touchend', myHandlerMobile);
+              console.log("prev")
+              go_to_slide("prev")
           }
-          lastPoint = currentPoint;
-          // $(".steps_scroll").unbind('touchend', myHandlerMobile);
       }
 
       function go_to_slide(direction) {
@@ -767,6 +832,16 @@ export default class Home{
 
 
       $(".steps_scroll").bind("mousewheel", myHandler);
+
+      $(".steps_scroll").bind('touchstart', function(e){
+        touchStartY = e.touches[0].clientY;
+      });
+
+      $(".steps_scroll").bind('touchmove', function(e){
+         e.preventDefault();
+      });
+
+
       $(".steps_scroll").bind('touchend', myHandlerMobile);
 
 
