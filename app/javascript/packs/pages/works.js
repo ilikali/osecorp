@@ -6,14 +6,15 @@ export default class Works{
       const parent = options.this
       const that = parent
 
-      parent.camera.position.set(14.6044, 1.4, 0)
+      parent.camera.position.set(-14.7, 1.4, 0)
 
       parent.work_videos = []
       const workGroup = new THREE.Group();
       const workGeometry = new THREE.PlaneGeometry( 4, 2.2, 32 );
-
-
       workGroup.position.set(-0.0307, 0, 0.0994);
+
+      const fog = new THREE.Fog('#000000', 1, 2)
+      parent.scene.fog = fog
 
       that.camera.rotation.y = THREE.Math.degToRad(90);
       parent.gltfLoader.load(
@@ -32,14 +33,6 @@ export default class Works{
               let floor_light = gltf.scene.children.find(x => x.name === "floor_light");
               floor_light.material = new THREE.MeshBasicMaterial( { color: 0x006FFF } );
               floor_light.layers.enable( parent.BLOOM_SCENE );
-
-
-              // const workGeometryVideo = new THREE.PlaneGeometry( 3.8, 1.8, 32 );
-              // let workItemVideo = new THREE.Mesh( workGeometryVideo, workMaterialBg);
-              // workItemVideo.rotation.y = THREE.Math.degToRad(90);
-              // workItemVideo.position.set(10.35, 1.75, 0)
-              // gltf.scene.add(workItemVideo)
-
 
               $(".work_slide").each(function(i){
                 let t = $(this);
@@ -68,20 +61,38 @@ export default class Works{
               $(document).on('mousemove', '.works_page_holder', function (event) {
                 cursor.x = event.clientX / parent.width - 0.5
                 cursor.y = event.clientY / parent.height - 0.5
-                console.log(cursor.x)
-                totalScene.rotation.x = cursor.x/100
-                workGroup.rotation.x = -cursor.x/50
+                // totalScene.rotation.x = cursor.x/100
+                workGroup.position.z = cursor.x/4
+                gltf.scene.position.z = cursor.x/6
               });
 
               parent.scene.add(gltf.scene)
               parent.updateAllMaterials()
+
+
+              gsap.to( fog, {
+                far: 30,
+                duration: 4,
+                ease: "power4.inOut"
+              });
+              gsap.to( parent.camera.position, {
+                x: 14.65,
+                y: 1.4,
+                z: 0,
+                duration: 4,
+                ease: "power4.inOut"
+              });
+              gsap.to( workGroup.position, {
+                y: 0,
+                duration: 4,
+                ease: "power4.inOut"
+              });
           }
       )
 
 
 
-      const fog = new THREE.Fog('#000000', 1, 30)
-      parent.scene.fog = fog
+
 
 
       parent.debugObject.positionX = 14.6044
