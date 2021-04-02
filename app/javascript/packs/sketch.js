@@ -178,8 +178,6 @@ export default class Sketch{
         this.materials = {};
 
 
-        this.terrain;
-
         this.color_material =  new THREE.ShaderMaterial({
           fragmentShader: `
           uniform vec3 iResolution;
@@ -604,12 +602,16 @@ export default class Sketch{
         }
 
         if (document.body.classList.contains('action_partners')) {
-          // parent.settings.uTime = elapsedTime
-          this.terrain.material.uniforms.time.value = elapsedTime;
         }
 
         if (document.body.classList.contains('action_works')) {
-
+          if ( this.work_videos ) {
+            this.work_videos.forEach(function(videoItem) {
+                if ( videoItem[0].readyState === videoItem[0].HAVE_ENOUGH_DATA ) {
+                    videoItem[1].needsUpdate = true;
+                }
+            });
+          }
         }
 
         if (document.body.classList.contains('action_about')) {

@@ -8,11 +8,16 @@ export default class Works{
 
       parent.camera.position.set(14.6044, 1.4, 0)
 
+      parent.work_videos = []
+      const workGroup = new THREE.Group();
+      const workGeometry = new THREE.PlaneGeometry( 4, 2.2, 32 );
 
+
+      workGroup.position.set(-0.0307, 0, 0.0994);
 
       that.camera.rotation.y = THREE.Math.degToRad(90);
       parent.gltfLoader.load(
-          '/models/works_2.gltf',
+          '/models/works_3.gltf',
           (gltf) =>
           {
               let totalScene = gltf.scene
@@ -29,26 +34,44 @@ export default class Works{
               floor_light.layers.enable( parent.BLOOM_SCENE );
 
 
-              const workGeometry = new THREE.PlaneGeometry( 4, 2, 32 );
-              const workMaterial = new THREE.MeshBasicMaterial( { color: 0x006FFF });
-
-              let workItem = new THREE.Mesh( workGeometry, parent.color_material);
-              workItem.rotation.y = THREE.Math.degToRad(90);
-              workItem.position.set(10.3383, 1.7964, 0)
-              parent.gui.add(workItem.position, 'x').min(-20).max(20).step(0.0001)
-              parent.gui.add(workItem.position, 'y').min(-20).max(20).step(0.0001)
-              parent.gui.add(workItem.position, 'z').min(-20).max(20).step(0.0001)
-
-              gltf.scene.add(workItem)
+              // const workGeometryVideo = new THREE.PlaneGeometry( 3.8, 1.8, 32 );
+              // let workItemVideo = new THREE.Mesh( workGeometryVideo, workMaterialBg);
+              // workItemVideo.rotation.y = THREE.Math.degToRad(90);
+              // workItemVideo.position.set(10.35, 1.75, 0)
+              // gltf.scene.add(workItemVideo)
 
 
-              // $(document).on('mousemove', '.works_page_holder', function (event) {
-              //   cursor.x = event.clientX / parent.width - 0.5
-              //   cursor.y = event.clientY / parent.height - 0.5
-              //   console.log(cursor.y)
-              //   // totalScene.rotation.x = cursor.x/20
-              //   totalScene.rotation.y = 1.5708 - cursor.y/20
-              // });
+              $(".work_slide").each(function(i){
+                let t = $(this);
+                let video = t.find(".video_holder")[0];
+                    video.load();
+                    video.play();
+                let videoTexture = new THREE.Texture(video);
+                    videoTexture.minFilter = THREE.LinearFilter;
+                    videoTexture.magFilter = THREE.LinearFilter;
+                    videoTexture.center = new THREE.Vector2(0.5, 0.5);
+                    // videoTexture.rotation = Math.PI;
+                    // videoTexture.flipY = false;
+                let workMaterial = new THREE.MeshBasicMaterial( {color:0xFFFFFF, map:videoTexture, side:THREE.DoubleSide } );
+                let workItem = new THREE.Mesh( workGeometry, workMaterial);
+                    workItem.position.x = 10.35;
+                    workItem.position.y = 1.9
+                    workItem.position.z = 0 + (-i*5);
+                    workItem.rotation.y = THREE.Math.degToRad(90);
+                let videoItem = [video, videoTexture]
+                    parent.work_videos.push(videoItem)
+                    workGroup.add( workItem);
+              })
+
+              gltf.scene.add(workGroup)
+
+              $(document).on('mousemove', '.works_page_holder', function (event) {
+                cursor.x = event.clientX / parent.width - 0.5
+                cursor.y = event.clientY / parent.height - 0.5
+                console.log(cursor.x)
+                totalScene.rotation.x = cursor.x/100
+                workGroup.rotation.x = -cursor.x/50
+              });
 
               parent.scene.add(gltf.scene)
               parent.updateAllMaterials()
