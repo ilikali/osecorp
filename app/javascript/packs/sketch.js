@@ -121,7 +121,7 @@ export default class Sketch{
 
         this.stats = new Stats()
         this.stats.showPanel(0)
-        // document.body.appendChild(this.stats.dom)
+        document.body.appendChild(this.stats.dom)
 
         this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
@@ -197,7 +197,7 @@ export default class Sketch{
 
 
 
-        this.color_material =  new THREE.ShaderMaterial({
+        this.color_material = new THREE.ShaderMaterial({
           fragmentShader: `
             uniform vec3 iResolution;
             uniform float iTime;
@@ -718,6 +718,7 @@ export default class Sketch{
         }
 
         if (document.body.classList.contains('action_partners')) {
+          this.waveMaterial.uniforms.iTime.value = elapsedTime;
         }
 
         if (document.body.classList.contains('action_works')) {
