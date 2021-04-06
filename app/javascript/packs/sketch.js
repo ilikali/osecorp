@@ -724,6 +724,13 @@ export default class Sketch{
           this.waveMaterial.uniforms.iTime.value = elapsedTime;
         }
 
+        if (document.body.classList.contains('action_contacts')) {
+          if(this.mixer){
+              this.mixer.update(deltaTime)
+          }
+
+        }
+
         if (document.body.classList.contains('action_works')) {
           if ( this.work_videos ) {
             this.work_videos.forEach(function(videoItem) {
