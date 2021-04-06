@@ -15,6 +15,7 @@ const TWEEN = require('@tweenjs/tween.js')
 import Home from './pages/home';
 import Works from './pages/works';
 import Partners from './pages/partners';
+import Contacts from './pages/contacts';
 
 
 
@@ -410,6 +411,8 @@ export default class Sketch{
         new Works({this: this});
       }else if (document.body.classList.contains('action_partners')) {
         new Partners({this: this});
+      }else if (document.body.classList.contains('action_contacts')) {
+        new Contacts({this: this});
       }else if (document.body.classList.contains('action_about')) {
         this.camera.position.set(0, 0, 2)
         this.camera.lookAt(0, 0, 0)

@@ -25,13 +25,6 @@ export default class Partners{
               hands = gltf.scene.children[0]
               console.log(hands.material)
               hands.position.z = -0.4847
-              // parent.gui.add(hands.position, 'x').min(-5).max(5).step(0.0001).name('posionX')
-              // parent.gui.add(hands.position, 'y').min(-5).max(5).step(0.0001).name('posionY')
-              // parent.gui.add(hands.position, 'z').min(-5).max(5).step(0.0001).name('posionZ')
-              // parent.gui.add(hands.rotation, 'x').min(-5).max(5).step(0.0001).name('rotationX')
-              // parent.gui.add(hands.rotation, 'y').min(-5).max(5).step(0.0001).name('rotationY')
-              // parent.gui.add(hands.rotation, 'z').min(-5).max(5).step(0.0001).name('rotationZ')
-
               parent.scene.add(gltf.scene)
               parent.updateAllMaterials()
           }
@@ -62,6 +55,16 @@ export default class Partners{
       parent.scene.add( icosahedron );
 
 
+      const sphereGeometry = new THREE.SphereGeometry( 0.05, 32, 32 );
+      const sphere = new THREE.Mesh( sphereGeometry, parent.color_material );
+      sphere.position.set(0.04, -0.42, 0)
+
+
+      parent.gui.add(sphere.position, 'x').min(-120).max(120).step(0.0001)
+      parent.gui.add(sphere.position, 'y').min(-120).max(120).step(0.0001)
+      parent.gui.add(sphere.position, 'z').min(-120).max(120).step(0.0001)
+
+      parent.scene.add( sphere );
 
 
       let partners = document.querySelector('.partners')
@@ -353,20 +356,11 @@ export default class Partners{
 
       const geo = new THREE.PlaneBufferGeometry(1, 1.2, 40, 40);
       const plane = new THREE.Mesh(geo, parent.waveMaterial);
-      plane.position.set(0, -0.55, 0)
+      plane.position.set(0, -0.75, 0)
       plane.rotation.x = THREE.Math.degToRad(-90);
       parent.scene.add(plane);
 
 
-
-
-
-      parent.gui.add(plane.position, 'x').min(-5).max(5).step(0.0001).name('posionX')
-      parent.gui.add(plane.position, 'y').min(-5).max(5).step(0.0001).name('posionY')
-      parent.gui.add(plane.position, 'z').min(-5).max(5).step(0.0001).name('posionZ')
-      parent.gui.add(plane.rotation, 'x').min(-5).max(5).step(0.0001).name('rotationX')
-      parent.gui.add(plane.rotation, 'y').min(-5).max(5).step(0.0001).name('rotationY')
-      parent.gui.add(plane.rotation, 'z').min(-5).max(5).step(0.0001).name('rotationZ')
 
 
 
