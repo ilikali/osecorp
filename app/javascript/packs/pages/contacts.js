@@ -6,8 +6,8 @@ export default class Contacts{
       const parent = options.this
       const that = parent
 
-      gsap.to( parent.camera.position, {x: 0.4162, y: 0.0694, z: 0.149, duration: 0.1});
-      gsap.to( parent.camera.rotation, {y: THREE.Math.degToRad(73), duration: 0.1});
+      gsap.to( parent.camera.position, {x: 0.2083, y: 0.085, z: 0.149, duration: 0.1});
+      gsap.to( parent.camera.rotation, {y: THREE.Math.degToRad(90), duration: 0.1});
 
 
       parent.mixer = null
@@ -27,7 +27,7 @@ export default class Contacts{
               });
               // gltf.scene.children[0].children[1].material.
 
-              let runner = gltf.scene.children[0].children[1]
+              let runner = gltf.scene.children[0]
 
               parent.gui.add(runner.position, 'x').min(-120).max(120).step(0.0001)
               parent.gui.add(runner.position, 'y').min(-120).max(120).step(0.0001)
@@ -43,8 +43,8 @@ export default class Contacts{
 
 
 
-      parent.debugObject.positionX = 14.6044
-      parent.debugObject.positionY = 1.4
+      parent.debugObject.positionX =  0.2083
+      parent.debugObject.positionY = 0.085
       parent.debugObject.positionZ = 0
       parent.debugObject.targetX = 0
       parent.debugObject.targetY = 90;
